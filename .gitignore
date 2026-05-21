@@ -1,0 +1,195 @@
+# === Go (sensor, operator, api) ===
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+dist/
+
+# Test binaries and coverage
+*.test
+*.out
+coverage.txt
+coverage.html
+*.prof
+
+# Go workspace
+go.work
+go.work.sum
+
+# Vendor (we don't vendor; use modules)
+vendor/
+
+# === eBPF ===
+# Compiled BPF objects
+*.bpf.o
+*.bpf.ll
+sensor/bpf/build/
+sensor/bpf/vmlinux.h
+
+# === Python (analyzer) ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# uv
+.uv/
+
+# Testing
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+
+# === TypeScript / Node (console) ===
+node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Build outputs
+console/dist/
+console/build/
+console/.next/
+console/out/
+
+# Vite
+.vite/
+
+# Testing
+console/coverage/
+.nyc_output/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# === Kubernetes / Helm ===
+# Local Helm chart packaging output
+deploy/helm/**/charts/
+deploy/helm/**/*.tgz
+deploy/helm/**/Chart.lock
+
+# kind / minikube local kubeconfigs
+.kube/
+kubeconfig
+*.kubeconfig
+
+# Local cluster state
+.kind/
+
+# === Generated code ===
+# Protobuf / gRPC - generated files should NOT be committed in most cases,
+# but operator zz_generated.* files ARE committed per CLAUDE.md
+# Adjust per your decision; this excludes proto-generated:
+api/proto/gen/
+console/src/gen/
+
+# === Secrets and credentials ===
+# Never commit these
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+.env
+.env.local
+.env.*.local
+secrets/
+credentials/
+
+# Operator signing keys (these MUST never be committed)
+*.signing-key
+*-signing.key
+
+# Cloud credentials
+.aws/
+.gcp/
+*-service-account.json
+
+# === Evidence and forensic artifacts (CRITICAL) ===
+# Never commit captured evidence to source control
+evidence/
+bundles/
+captures/
+*.evidence
+*.bundle
+test-evidence/
+e2e-output/
+
+# === IDE and editor ===
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.sublime-project
+*.sublime-workspace
+.fleet/
+.zed/
+
+# JetBrains
+*.iml
+.idea_modules/
+
+# === Build tooling ===
+# Container builds
+.docker/
+*.tar
+*.tar.gz
+
+# Local development state
+.local/
+tmp/
+temp/
+scratch/
+
+# === Logs and runtime ===
+*.log
+logs/
+
+# === macOS / Linux / Windows cruft ===
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/

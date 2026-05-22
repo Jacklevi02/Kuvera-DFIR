@@ -1,0 +1,75 @@
+name: Task
+description: A concrete unit of work, typically 0.5d–2d. The default issue type.
+title: "<component>: <imperative short description>"
+labels: ["type:task"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What
+      description: What needs to be done. Be specific.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: One sentence tying this to the parent epic or sprint goal.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      value: |
+        - [ ] 
+        - [ ] 
+        - [ ] Tests added or updated
+        - [ ] Lint passes
+    validations:
+      required: true
+  - type: input
+    id: parent-epic
+    attributes:
+      label: Parent epic
+      description: Issue number of the parent epic, e.g. "#42". This task will be linked as a sub-issue.
+    validations:
+      required: true
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - sensor
+        - operator
+        - api
+        - analyzer
+        - console
+        - deploy
+        - docs
+        - infra
+    validations:
+      required: true
+  - type: dropdown
+    id: estimate
+    attributes:
+      label: Estimate
+      options:
+        - 0.5d
+        - 1d
+        - 2d
+        - 3d
+        - 5d
+    validations:
+      required: true
+  - type: checkboxes
+    id: chain-of-custody
+    attributes:
+      label: Chain-of-custody scrutiny
+      options:
+        - label: This task touches chain-of-custody flows and requires extra review.
+  - type: textarea
+    id: notes
+    attributes:
+      label: Implementation notes
+      description: References to PROJECT.md sections, prior art, gotchas. Optional.

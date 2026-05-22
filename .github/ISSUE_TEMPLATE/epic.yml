@@ -1,0 +1,64 @@
+name: Epic
+description: A sprint-sized body of work that contains multiple sub-issues.
+title: "[Epic] <short description>"
+labels: ["type:epic"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: One or two sentences. What does "done" look like at the epic level?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Bullet list. Each criterion must be objectively verifiable.
+      value: |
+        - [ ] 
+        - [ ] 
+    validations:
+      required: true
+  - type: dropdown
+    id: component
+    attributes:
+      label: Primary component
+      options:
+        - sensor
+        - operator
+        - api
+        - analyzer
+        - console
+        - deploy
+        - docs
+        - infra
+    validations:
+      required: true
+  - type: dropdown
+    id: sprint
+    attributes:
+      label: Sprint
+      options:
+        - Sprint 1
+        - Sprint 2
+        - Sprint 3
+        - Sprint 4
+        - Sprint 5
+        - Sprint 6
+    validations:
+      required: true
+  - type: checkboxes
+    id: chain-of-custody
+    attributes:
+      label: Chain-of-custody scrutiny
+      description: Per CLAUDE.md rule 4, flag any work that touches capture, sealing, hashing, signing, or the transparency log.
+      options:
+        - label: This epic touches chain-of-custody flows and requires extra review.
+  - type: textarea
+    id: sub-issues
+    attributes:
+      label: Sub-issues
+      description: Linked after creation via the GitHub sub-issues feature. Leave empty on creation.
+      value: |
+        _Linked as sub-issues after epic creation._

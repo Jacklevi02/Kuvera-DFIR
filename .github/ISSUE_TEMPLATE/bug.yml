@@ -1,4 +1,4 @@
-name: Bug
+name: Bug Report
 description: Something is broken.
 title: "[Bug] <short description>"
 labels: ["type:bug"]
@@ -13,10 +13,7 @@ body:
     id: reproduction
     attributes:
       label: Reproduction
-      value: |
-        1. 
-        2. 
-        3. 
+      value: "1. \n2. \n3. \n"
     validations:
       required: true
   - type: textarea
@@ -51,9 +48,9 @@ body:
     attributes:
       label: Severity
       options:
-        - P0 — blocks MVP
-        - P1 — blocks current sprint
-        - P2 — should fix
+        - P0 - blocks MVP
+        - P1 - blocks current sprint
+        - P2 - should fix
     validations:
       required: true
   - type: checkboxes

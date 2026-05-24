@@ -1,5 +1,5 @@
 name: Task
-description: A concrete unit of work, typically 0.5d–2d. The default issue type.
+description: A concrete unit of work, typically 0.5d-2d. The default issue type.
 title: "<component>: <imperative short description>"
 labels: ["type:task"]
 body:

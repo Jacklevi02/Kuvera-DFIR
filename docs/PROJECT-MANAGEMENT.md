@@ -2,18 +2,18 @@
 
 This document describes how the Kuvera project is run on GitHub: the Project board schema, label taxonomy, sprint cadence, Definition of Done, and issue template index. It is the authoritative reference for project management conventions.
 
-For the roadmap itself (sprint dates, goals, Gantt), see `docs/roadmap.md`.  
+For the roadmap itself (sprint dates, goals, Gantt), see `docs/ROADMAP.md`.  
 For coding conventions, see `CLAUDE.md`.  
 For product spec, see `PROJECT.md`.
 
 ## Source of truth
 
 - **Live ticket state, sprint membership, status, dates:** the [Kuvera GitHub Project](https://github.com/users/Jacklevi02/projects) (Project items are canonical).
-- **Roadmap, sprint goals, acceptance criteria, Gantt:** `docs/roadmap.md` in this repo.
+- **Roadmap, sprint goals, acceptance criteria, Gantt:** `docs/ROADMAP.md` in this repo.
 - **Coding conventions, architecture rules:** `CLAUDE.md` in this repo.
 - **Definition of Done, project conventions:** this file.
 
-If the Project and `docs/roadmap.md` disagree on a ticket, the Project wins. If they disagree on a sprint goal or acceptance criterion, the roadmap wins.
+If the Project and `docs/ROADMAP.md` disagree on a ticket, the Project wins. If they disagree on a sprint goal or acceptance criterion, the roadmap wins.
 
 ## Repository
 
@@ -25,7 +25,7 @@ If the Project and `docs/roadmap.md` disagree on a ticket, the Project wins. If 
 - Sprint week: Monday to Sunday.
 - The next sprint starts the Monday immediately following the previous sprint's Sunday.
 - MVP runs Sprint 1 through Sprint 6 (01 Jun – 03 Oct 2026).
-- Sprint dates and goals: see `docs/roadmap.md`.
+- Sprint dates and goals: see `docs/ROADMAP.md`.
 
 ## GitHub Project schema
 
@@ -174,4 +174,4 @@ While solo, all roles are the maintainer. Documenting now for forward compatibil
 ## Tooling assumptions
 
 - `gh` CLI for issue and Project manipulation.
-- `make` targets defined in `CLAUDE.md`: `dev-cluster`, `build`, `deploy-dev`, `tes
+- `make` targets defined in `CLAUDE.md`: `dev-cluster`, `build`, `deploy-dev`, `test`, `lint`, `e2e`.

@@ -1,0 +1,31 @@
+name: Spike
+description: A timeboxed investigation. Output is a written finding, not code.
+title: "[Spike] <question to answer>"
+labels: ["type:spike"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: The specific question this spike answers.
+    validations:
+      required: true
+  - type: input
+    id: timebox
+    attributes:
+      label: Timebox
+      placeholder: e.g. "1d"
+    validations:
+      required: true
+  - type: textarea
+    id: deliverable
+    attributes:
+      label: Deliverable
+      description: What is produced. Usually a comment on this issue, an ADR in `docs/adr/`, or a follow-up task issue.
+    validations:
+      required: true
+  - type: input
+    id: parent-epic
+    attributes:
+      label: Parent epic
+      description: Optional. Issue number of the parent epic if this spike feeds one.

@@ -78,14 +78,14 @@ The stack is fixed. Each choice is deliberate. Contributors should not introduce
 
 **Console (web UI)**
 
-- Language: TypeScript with React 19+ and Vite.
+- Language: TypeScript with React 19+ and Vite 8.
 - UI: shadcn/ui components, TanStack Query for server state, TanStack Router for routing.
 - Forms: react-hook-form + zod.
 - Visualization: a timeline component built on visx or vis-timeline; a graph view for blast radius using Cytoscape.js or react-flow.
 
 **Storage**
 
-- Evidence bundles (large, immutable binary blobs): S3-compatible object storage. MinIO for self-hosted deployments; S3, GCS, or Azure Blob for cloud. Bundles are content-addressed by SHA-256.
+- Evidence bundles (large, immutable binary blobs): S3-compatible object storage. SeaweedFS for self-hosted deployments (MinIO was archived in February 2026; SeaweedFS is the S3-compatible replacement); S3, GCS, or Azure Blob for cloud. Bundles are content-addressed by SHA-256.
 - Metadata, timelines, and queries: PostgreSQL with the `timescaledb` extension for time-series timeline data.
 - Search across evidence: OpenSearch (post-MVP). The MVP omits search.
 - Sensor event stream: NATS JetStream. Lightweight, Kubernetes-friendly, no Kafka operational burden.
@@ -196,7 +196,7 @@ DCO sign-off is required on every commit. No CLA.
 
 **Weeks 4–6:** Build the operator skeleton with Kubebuilder. Define the `ForensicCapture` CRD. Wire up "when a CR is created, do nothing useful but log it."
 
-**Weeks 7–9:** Operator performs real capture: pause container via CRI, tar the filesystem, hash it, drop the bundle in MinIO.
+**Weeks 7–9:** Operator performs real capture: pause container via CRI, tar the filesystem, hash it, drop the bundle in SeaweedFS.
 
 **Weeks 10–12:** Minimal console: list captures, view bundle metadata, render the event timeline as a table.
 

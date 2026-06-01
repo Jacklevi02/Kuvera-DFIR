@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or discussion
+    url: https://github.com/Jacklevi02/Kuvera-DFIR/discussions
+    about: Use Discussions for questions, ideas, or anything not actionable as an issue.

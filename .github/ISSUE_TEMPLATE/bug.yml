@@ -1,0 +1,61 @@
+name: Bug Report
+description: Something is broken.
+title: "[Bug] <short description>"
+labels: ["type:bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What's broken
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      value: "1. \n2. \n3. \n"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+    validations:
+      required: true
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - sensor
+        - operator
+        - api
+        - analyzer
+        - console
+        - deploy
+        - docs
+        - infra
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - P0 - blocks MVP
+        - P1 - blocks current sprint
+        - P2 - should fix
+    validations:
+      required: true
+  - type: checkboxes
+    id: chain-of-custody
+    attributes:
+      label: Chain-of-custody impact
+      options:
+        - label: This bug affects chain-of-custody correctness. Treat as P0 regardless of other severity.

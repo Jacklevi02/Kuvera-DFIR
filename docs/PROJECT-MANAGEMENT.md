@@ -21,10 +21,10 @@ If the Project and `docs/roadmap.md` disagree on a ticket, the Project wins. If 
 
 ## Sprint cadence
 
-- Sprint length: 2 weeks.
+- Sprint length: 3 weeks.
 - Sprint week: Monday to Sunday.
 - The next sprint starts the Monday immediately following the previous sprint's Sunday.
-- MVP runs Sprint 1 through Sprint 6 (25 May – 16 Aug 2026).
+- MVP runs Sprint 1 through Sprint 6 (01 Jun – 03 Oct 2026).
 - Sprint dates and goals: see `docs/roadmap.md`.
 
 ## GitHub Project schema
@@ -36,7 +36,7 @@ The project uses a single GitHub Project of type "Team" to support iterations an
 | Field | Type | Values |
 |---|---|---|
 | Status | Single-select (built-in) | Backlog, Todo, In Progress, In Review, Done, Blocked |
-| Sprint | Iteration | Sprint 1 (25 May 2026, 2w), Sprint 2 (8 Jun 2026, 2w), Sprint 3 (22 Jun 2026, 2w), Sprint 4 (6 Jul 2026, 2w), Sprint 5 (20 Jul 2026, 2w), Sprint 6 (3 Aug 2026, 2w) |
+| Sprint | Iteration | Sprint 1 (01 Jun 2026, 3w), Sprint 2 (21 Jun 2026, 3w), Sprint 3 (12 Jul 2026, 3w), Sprint 4 (02 Aug 2026, 3w), Sprint 5 (23 Aug 2026, 3w), Sprint 6 (13 Sep 2026, 3w) |
 | Component | Single-select | sensor, operator, api, analyzer, console, deploy, docs, infra |
 | Type | Single-select | epic, feature, task, spike, chore, bug |
 | Estimate | Single-select | 0.5d, 1d, 2d, 3d, 5d |
@@ -153,15 +153,6 @@ A sprint is closed when:
    - **Screencast or terminal recording** — link, where it makes sense.
 4. The Roadmap view is reviewed for dependency drift into the next sprint.
 5. Any new `chain-of-custody`-labelled tickets are reviewed against `CLAUDE.md` rule 4.
-
-Infrastructure-only sprints are allowed; the demo writeup still has to exist and explain what was done.
-
-## Sprint demo writeups
-
-- Path: `docs/sprint-demos/sprint-N.md`.
-- Written before closing the sprint.
-- Durable, version-controlled record of what shipped each sprint.
-- This is the only sprint-related markdown in the repo beyond `docs/roadmap.md`; everything else lives in the GitHub Project.
 
 ## Workflow conventions
 

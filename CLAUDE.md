@@ -59,7 +59,7 @@ A self-managed, on-cluster forensics platform with these components:
 
 ### Go (sensor, operator, api)
 
-- Go 1.22+
+- Go 1.26+
 - `gofmt`, `goimports`, `golangci-lint` (config in `.golangci.yaml`)
 - Errors: wrap with `fmt.Errorf("doing X: %w", err)`. No `pkg/errors`. No bare `err.Error()`.
 - Logging: `log/slog` only. Structured. Always include relevant K8s identifiers (namespace, pod, node).
@@ -79,7 +79,7 @@ A self-managed, on-cluster forensics platform with these components:
 
 ### TypeScript (console)
 
-- TypeScript 5.4+, strict mode on, `noUncheckedIndexedAccess` enabled.
+- TypeScript 6.0+, strict mode on, `noUncheckedIndexedAccess` enabled.
 - React 19+, functional components, hooks. No class components.
 - State: TanStack Query for server state. Zustand for client state if needed. No Redux.
 - Routing: TanStack Router.
@@ -191,7 +191,7 @@ MVP (current focus):
 - Operator: `ForensicCapture` CRD, filesystem export, sensor history dump, manifest scrape, bundle sealing.
 - API: list captures, get bundle, download artifact.
 - Console: list view, capture detail view, simple timeline (table, not visualization).
-- Storage: MinIO + PostgreSQL. No OpenSearch yet.
+- Storage: SeaweedFS + PostgreSQL. No OpenSearch yet.
 - Chain of custody: SHA-256 + local Merkle log + operator signing key.
 
 Post-MVP:

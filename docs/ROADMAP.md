@@ -3,20 +3,20 @@
 This document is the durable, version-controlled view of the Kuvera MVP roadmap.
 For live ticket state, see the [Kuvera GitHub Project](https://github.com/users/<owner>/projects/<n>).
 
-**MVP target:** 16 August 2026  
-**Sprint length:** 2 weeks, Monday–Sunday  
-**Approach:** Vertical slice first, then deepen. Each sprint ends in a demoable state documented in `docs/sprint-demos/sprint-N.md`.
+**MVP target:** 03 October 2026  
+**Sprint length:** 3 weeks  
+**Approach:** Vertical slice first, then deepen. Each sprint ends in a demoable state.
 
 ## Sprint schedule
 
 | Sprint | Dates                     | Theme                                |
 |--------|---------------------------|--------------------------------------|
-| 1      | 25 May – 7 Jun 2026       | Foundations & eBPF hello world       |
-| 2      | 8 Jun – 21 Jun 2026       | Sensor as DaemonSet + event pipeline |
-| 3      | 22 Jun – 5 Jul 2026       | Operator skeleton + ForensicCapture  |
-| 4      | 6 Jul – 19 Jul 2026       | Real capture + chain of custody      |
-| 5      | 20 Jul – 2 Aug 2026       | API gateway + analyzer + timeline    |
-| 6      | 3 Aug – 16 Aug 2026       | Console + end-to-end MVP             |
+| 1      | 01 Jun – 20 Jun 2026       | Foundations & eBPF hello world       |
+| 2      | 21 Jun – 11 Jul 2026       | Sensor as DaemonSet + event pipeline |
+| 3      | 12 Jun – 01 Aug 2026       | Operator skeleton + ForensicCapture  |
+| 4      | 02 Aug – 22 Aug 2026       | Real capture + chain of custody      |
+| 5      | 23 Aug – 12 Sep 2026       | API gateway + analyzer + timeline    |
+| 6      | 13 Sep – 03 Oct 2026       | Console + end-to-end MVP             |
 
 ## Sprint goals & acceptance criteria
 
@@ -24,7 +24,7 @@ For live ticket state, see the [Kuvera GitHub Project](https://github.com/users/
 **Goal:** Repo, tooling, CI, and a single eBPF program capturing `execve` events for one container, printed to stdout from userspace.
 
 **Acceptance criteria:**
-- Monorepo scaffolded per `CLAUDE.md` layout.
+- Monorepo scaffolded.
 - `make dev-cluster`, `make build`, `make lint`, `make test` all work.
 - CI runs lint + test on every PR.
 - A standalone Go binary loads an eBPF program that captures `execve` and prints events filtered by cgroup ID.
@@ -38,7 +38,7 @@ For live ticket state, see the [Kuvera GitHub Project](https://github.com/users/
 - Sensor runs on every node in the dev cluster.
 - Four syscalls captured with per-container scoping.
 - Events written to a local ring buffer; userspace agent reads and persists last hour to disk.
-- No network egress from the sensor (CLAUDE.md rule 1).
+- No network egress from the sensor.
 - Sensor CPU overhead measured and documented (<2% target).
 
 ### Sprint 3 — Operator skeleton + ForensicCapture CRD (22 Jun – 5 Jul)
@@ -52,7 +52,7 @@ For live ticket state, see the [Kuvera GitHub Project](https://github.com/users/
 - Helm chart deploys operator + CRDs.
 
 ### Sprint 4 — Real capture + chain of custody (6 Jul – 19 Jul)
-**Goal:** Operator performs real evidence capture: pause container via CRI, tar the filesystem, pull pod manifest, dump sensor history, hash everything, build a bundle, upload to MinIO, append to transparency log.
+**Goal:** Operator performs real evidence capture: pause container via CRI, tar the filesystem, pull pod manifest, dump sensor history, hash everything, build a bundle, upload to SeaweedFS, append to transparency log.
 
 **Acceptance criteria:**
 - Container pause via CRI works.
@@ -61,7 +61,7 @@ For live ticket state, see the [Kuvera GitHub Project](https://github.com/users/
 - Pod manifest + K8s events scraped.
 - Bundle assembled with Merkle root; root signed by operator key.
 - Transparency log appended (local append-only file, Rekor-inspired).
-- Bundle uploaded to MinIO, content-addressed by SHA-256.
+- Bundle uploaded to SeaweedFS, content-addressed by SHA-256.
 - All chain-of-custody touched tickets flagged for review.
 
 ### Sprint 5 — API gateway + analyzer + timeline (20 Jul – 2 Aug)
@@ -78,7 +78,7 @@ For live ticket state, see the [Kuvera GitHub Project](https://github.com/users/
 **Goal:** Web UI to list captures, view capture detail, render timeline as a table, download bundle. End-to-end demo: trigger capture → wait → investigate in UI.
 
 **Acceptance criteria:**
-- React + Vite console scaffolded per `CLAUDE.md`.
+- React + Vite console scaffolded.
 - Generated TypeScript API client from proto via `buf generate`.
 - Views: capture list, capture detail with metadata, timeline table.
 - Bundle download from UI.
@@ -94,25 +94,25 @@ gantt
     axisFormat %d %b
 
     section Sprint 1
-    Foundations & eBPF hello world    :s1, 2026-05-25, 14d
+    Foundations & eBPF hello world    :s1, 2026-06-01, 20d
 
     section Sprint 2
-    Sensor DaemonSet + pipeline       :s2, after s1, 14d
+    Sensor DaemonSet + pipeline       :s2, after s1, 21d
 
     section Sprint 3
-    Operator + ForensicCapture CRD    :s3, after s2, 14d
+    Operator + ForensicCapture CRD    :s3, after s2, 21d
 
     section Sprint 4
-    Real capture + chain of custody   :s4, after s3, 14d
+    Real capture + chain of custody   :s4, after s3, 21d
 
     section Sprint 5
-    API + analyzer + timeline         :s5, after s4, 14d
+    API + analyzer + timeline         :s5, after s4, 21d
 
     section Sprint 6
-    Console + end-to-end MVP          :s6, after s5, 14d
+    Console + end-to-end MVP          :s6, after s5, 21d
 
     section Milestones
-    MVP delivered                     :milestone, m1, 2026-08-16, 0d
+    MVP delivered                     :milestone, m1, 2026-10-03, 0d
 ```
 
 ## Post-MVP (not scheduled)

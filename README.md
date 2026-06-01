@@ -56,10 +56,10 @@ Pre-alpha. Active early development. Not production-ready.
 │                          │                                      │
 │              ┌───────────┼───────────┐                          │
 │              │           │           │                          │
-│         ┌────▼───┐  ┌────▼───┐  ┌────▼─────┐                    │
-│         │ MinIO  │  │Postgres│  │OpenSearch│                    │
-│         │(blobs) │  │(meta)  │  │(timeline)│                    │
-│         └────────┘  └────────┘  └──────────┘                    │
+│         ┌────▼────┐  ┌────▼───┐  ┌────▼─────┐                   │
+│         │SeaweedFS│  │Postgres│  │OpenSearch│                   │
+│         │ (blobs) │  │(meta)  │  │(timeline)│                   │
+│         └─────────┘  └────────┘  └──────────┘                   │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -76,7 +76,7 @@ Pre-alpha. Active early development. Not production-ready.
 - **API gateway:** Go (gRPC + REST)
 - **Analyzer workers:** Python (Volatility3, YARA, custom)
 - **Console:** TypeScript, React, Vite, shadcn/ui, TanStack Query
-- **Storage:** MinIO (blobs), PostgreSQL + TimescaleDB (metadata), OpenSearch (search)
+- **Storage:** SeaweedFS (blobs), PostgreSQL + TimescaleDB (metadata), OpenSearch (search)
 - **Messaging:** NATS JetStream
 - **Deployment:** Helm
 
@@ -120,7 +120,7 @@ open http://localhost:8080
 Currently building toward MVP. See [PROJECT.md](./PROJECT.md) for full project specification and [CLAUDE.md](./CLAUDE.md) for development conventions.
 
 ```bash
-# Prerequisites: Go 1.22+, Node 20+, Python 3.12+, Docker, kind or minikube
+# Prerequisites: Go 1.26+, Node 24+, Python 3.12+, Docker, kind or minikube
 make dev-cluster   # Spins up a kind cluster
 make build         # Builds all components
 make deploy-dev    # Deploys Kuvera to the dev cluster

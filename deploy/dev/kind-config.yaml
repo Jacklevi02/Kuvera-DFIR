@@ -1,0 +1,37 @@
+# kind cluster definition for Kuvera local development (EPIC-1 / T1.3).
+#
+# The Kuvera sensor is an eBPF DaemonSet. kind runs each node as a Docker
+# container that shares the host kernel, so eBPF programs load against the
+# host kernel's BTF. This file makes the eBPF prerequisites explicit so a
+# freshly created dev cluster can actually load probes:
+#
+#   * BTF      /sys/kernel/btf/vmlinux is exported by the host kernel and is
+#              visible inside every node container without an extra mount. It
+#              requires the host kernel to be built with CONFIG_DEBUG_INFO_BTF=y
+#              (true for stock Ubuntu/Debian/Fedora kernels). Verified after
+#              creation by scripts/dev-cluster-verify.sh.
+#   * bpffs    /sys/fs/bpf is bind-mounted from the host so pinned maps and
+#              programs behave as they would on a real node.
+#   * debugfs  /sys/kernel/debug is bind-mounted so tracefs-backed probes
+#              (kprobes / tracepoints) are reachable from inside the sensor.
+#
+# The node image is intentionally NOT pinned here. `make dev-cluster` passes
+# --image only when KIND_NODE_IMAGE is set; otherwise kind uses the default
+# node image that ships with the installed kind version (guaranteed to exist).
+# The cluster name is supplied by `make dev-cluster` via --name
+# (KIND_CLUSTER_NAME, default "kuvera-dev"), keeping a single source of truth.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    extraMounts:
+      - hostPath: /sys/fs/bpf
+        containerPath: /sys/fs/bpf
+      - hostPath: /sys/kernel/debug
+        containerPath: /sys/kernel/debug
+  - role: worker
+    extraMounts:
+      - hostPath: /sys/fs/bpf
+        containerPath: /sys/fs/bpf
+      - hostPath: /sys/kernel/debug
+        containerPath: /sys/kernel/debug

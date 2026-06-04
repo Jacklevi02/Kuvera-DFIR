@@ -3,20 +3,27 @@
 # Single entry point for building, testing, linting, and running Kuvera in a
 # local dev cluster (see CLAUDE.md, "Development workflow").
 #
-# Most targets are intentionally stubs at this stage: they print a uniform
+# Several targets are still stubs at this stage: they print a uniform
 # "not yet implemented" message and exit 0 so the target graph is usable and
 # discoverable before the real logic lands. Sibling tickets in EPIC-1 replace
 # each stub body with a real implementation:
 #
-#   dev-cluster -> T1.3   build -> EPIC-1   test -> T1.6   lint -> T1.4 / T1.5
+#   build -> EPIC-1   test -> T1.6   lint -> T1.4 / T1.5
 #
-# `clean` is implemented now (it only removes local, git-ignored build output).
+# `clean` and the `dev-cluster` / `dev-cluster-down` targets (T1.3) are real.
 
 SHELL := /usr/bin/env bash
 
 .DEFAULT_GOAL := help
 
-.PHONY: help dev-cluster build test lint deploy-dev e2e clean
+# kind dev cluster (T1.3). Override on the command line, e.g.:
+#   make dev-cluster KIND_CLUSTER_NAME=kuvera-test KIND_NODE_IMAGE=kindest/node:v1.31.2
+#   make dev-cluster KIND_RECREATE=1     # delete and rebuild an existing cluster
+KIND_CLUSTER_NAME ?= kuvera-dev
+KIND_NODE_IMAGE   ?=
+export KIND_CLUSTER_NAME KIND_NODE_IMAGE
+
+.PHONY: help dev-cluster dev-cluster-down build test lint deploy-dev e2e clean
 
 help: ## List all available targets
 	@echo "Kuvera — make targets:"
@@ -25,8 +32,11 @@ help: ## List all available targets
 		| sort \
 		| awk 'BEGIN {FS = ":.*## "} {printf "  %-12s %s\n", $$1, $$2}'
 
-dev-cluster: ## Boot a local kind cluster with eBPF support (T1.3)
-	@echo "make dev-cluster: not yet implemented (tracked in EPIC-1 / T1.3)"
+dev-cluster: ## Boot (or ensure) a local kind cluster with eBPF support (T1.3)
+	@scripts/dev-cluster.sh up
+
+dev-cluster-down: ## Tear down the local kind dev cluster (T1.3)
+	@scripts/dev-cluster.sh down
 
 build: ## Build all components (sensor, operator, api, analyzer, console)
 	@echo "make build: not yet implemented (tracked in EPIC-1)"

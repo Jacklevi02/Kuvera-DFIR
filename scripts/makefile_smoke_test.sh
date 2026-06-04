@@ -17,8 +17,15 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
-# Every target the Makefile is expected to expose, per CLAUDE.md and T1.2.
-targets=(help dev-cluster build test lint deploy-dev e2e clean)
+# Every target the Makefile is expected to expose, per CLAUDE.md, T1.2, and
+# T1.3 (which adds dev-cluster-down).
+targets=(help dev-cluster dev-cluster-down build test lint deploy-dev e2e clean)
+
+# Targets safe to actually run in any environment. dev-cluster and
+# dev-cluster-down provision/destroy a real kind cluster (Docker + kind) as of
+# T1.3, so they are exercised by scripts/dev_cluster_config_test.sh and e2e
+# instead of being invoked blindly here.
+runnable=(help build test lint deploy-dev e2e clean)
 
 fail=0
 
@@ -33,8 +40,8 @@ for t in "${targets[@]}"; do
 	fi
 done
 
-echo "==> every target exits 0"
-for t in "${targets[@]}"; do
+echo "==> every runnable target exits 0"
+for t in "${runnable[@]}"; do
 	if make "$t" >/dev/null 2>&1; then
 		echo "  ok: make $t"
 	else

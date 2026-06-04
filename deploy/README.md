@@ -13,9 +13,29 @@ deploy/
 ## Quick start (dev cluster)
 
 ```bash
-make dev-cluster     # boots a kind cluster with eBPF support
-make deploy-dev      # installs the Helm chart to the dev cluster
+make dev-cluster       # boots a kind cluster with eBPF support (idempotent)
+make deploy-dev        # installs the Helm chart to the dev cluster
+make dev-cluster-down  # tears the kind cluster down
 ```
+
+`make dev-cluster` is idempotent: re-running it against an existing cluster
+just re-checks node readiness. Pass `KIND_RECREATE=1` to delete and rebuild
+(e.g. after editing `deploy/dev/kind-config.yaml`). Common overrides:
+
+```bash
+make dev-cluster KIND_CLUSTER_NAME=kuvera-test   # alternate cluster name
+make dev-cluster KIND_NODE_IMAGE=kindest/node:v1.31.2   # pin the node image
+make dev-cluster KIND_RECREATE=1                 # force a clean rebuild
+```
+
+After the cluster is up, verify the eBPF prerequisites:
+
+```bash
+scripts/dev-cluster-verify.sh   # nodes Ready + BTF present on a node
+```
+
+`scripts/dev_cluster_config_test.sh` validates the kind config and scripts
+offline (no Docker/kind required), suitable for `make test` and CI.
 
 ## Helm chart
 

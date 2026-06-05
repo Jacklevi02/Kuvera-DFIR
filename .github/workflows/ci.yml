@@ -1,0 +1,183 @@
+name: CI
+
+# Run on every push and pull request targeting main or dev.
+# Stacked PRs that target intermediate feature branches get coverage when the
+# branch under review is eventually retargeted to dev/main for merge.
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  lint:
+    name: Lint (Go, Python, TypeScript)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── Go setup ──────────────────────────────────────────────────────────
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+          # Disable the built-in module cache so we control it via
+          # actions/cache below, giving us a single cache key across all
+          # Go jobs.
+          cache: false
+
+      - name: Cache Go modules and build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('sensor/go.sum', 'operator/go.sum', 'api/go.sum') }}
+          restore-keys: ${{ runner.os }}-go-
+
+      - name: Install golangci-lint
+        run: |
+          curl -sSfL \
+            https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh \
+            | sh -s -- -b "$(go env GOPATH)/bin" v2.5.0
+
+      # ── Python setup ──────────────────────────────────────────────────────
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Python linters
+        run: pip install ruff mypy
+
+      # ── Node setup ────────────────────────────────────────────────────────
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Node linters
+        # Install globally so eslint/prettier are available without a local
+        # node_modules. console/node_modules is not committed.
+        run: npm install -g eslint prettier
+
+      # ── Lint ──────────────────────────────────────────────────────────────
+      - name: make lint
+        run: make lint GOLANGCI_LINT="$(go env GOPATH)/bin/golangci-lint"
+
+  test:
+    name: Test (Go, Python, TypeScript)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── Go setup ──────────────────────────────────────────────────────────
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+          cache: false
+
+      - name: Cache Go modules and build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('sensor/go.sum', 'operator/go.sum', 'api/go.sum') }}
+          restore-keys: ${{ runner.os }}-go-
+
+      # ── Python setup ──────────────────────────────────────────────────────
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Python test tools
+        run: pip install pytest
+
+      # ── Node setup ────────────────────────────────────────────────────────
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install vitest
+        # Pre-install so make test does not download it at runtime.
+        run: npm install -g vitest
+
+      # ── Test ──────────────────────────────────────────────────────────────
+      - name: make test
+        run: make test VITEST=vitest
+
+  validate:
+    name: Validate tooling config
+    runs-on: ubuntu-latest
+    # Run after lint and test to catch config drift separately.
+    needs: [lint, test]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+          cache: false
+
+      - name: Cache Go modules and build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('sensor/go.sum', 'operator/go.sum', 'api/go.sum') }}
+          restore-keys: ${{ runner.os }}-go-
+
+      - name: Install golangci-lint
+        run: |
+          curl -sSfL \
+            https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh \
+            | sh -s -- -b "$(go env GOPATH)/bin" v2.5.0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install all tools
+        run: pip install ruff mypy pytest
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Node tools
+        run: npm install -g eslint prettier vitest
+
+      - name: Validate golangci-lint config
+        # golangci-lint was installed to $GOPATH/bin; actions/setup-go adds
+        # $GOPATH/bin to PATH so no explicit path override is needed.
+        run: bash scripts/golangci_lint_test.sh
+
+      - name: Validate Python/TS lint config
+        run: bash scripts/python_ts_lint_test.sh
+
+      - name: Validate make test wiring
+        # vitest installed globally above; pass VITEST=vitest so make test
+        # uses the binary directly rather than the npx default.
+        run: bash scripts/make_test_smoke_test.sh
+        env:
+          VITEST: vitest
+
+      - name: Validate Makefile targets
+        run: bash scripts/makefile_smoke_test.sh

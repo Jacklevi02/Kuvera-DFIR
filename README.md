@@ -117,14 +117,40 @@ open http://localhost:8080
 
 ## Development
 
-Currently building toward MVP. See [PROJECT.md](./PROJECT.md) for full project specification and [CLAUDE.md](./CLAUDE.md) for development conventions.
+### Documentation
+
+| Document | What it covers |
+|----------|---------------|
+| [PROJECT.md](./PROJECT.md) | Full product spec: capabilities, architecture, CRDs, MVP scope, post-MVP roadmap |
+| [CLAUDE.md](./CLAUDE.md) | Coding conventions, architecture rules, component layout, and what to push back on |
+| [docs/ROADMAP.md](./docs/ROADMAP.md) | Sprint schedule, per-sprint goals, and Gantt chart |
+| [docs/PROJECT-MANAGEMENT.md](./docs/PROJECT-MANAGEMENT.md) | Project board schema, label taxonomy, workflow conventions, and branch naming |
+| [CONTRIBUTING.md](./CONTRIBUTING.md) | DCO sign-off requirement, pre-alpha status, branch naming |
+
+### Prerequisites
+
+Go 1.26+, Node 24+, Python 3.12+, Docker with `kind`.
+
+### Common commands
 
 ```bash
-# Prerequisites: Go 1.26+, Node 24+, Python 3.12+, Docker, kind or minikube
-make dev-cluster   # Spins up a kind cluster
-make build         # Builds all components
-make deploy-dev    # Deploys Kuvera to the dev cluster
-make test          # Runs tests
+make dev-cluster   # Boot a local kind cluster with eBPF support
+make build         # Build all components
+make deploy-dev    # Deploy to the dev cluster
+make test          # Run all tests
+make lint          # Run all linters (Go, Python, TypeScript)
+```
+
+### Component structure
+
+```
+sensor/     Go + eBPF — syscall, file, and network event capture (DaemonSet)
+operator/   Go + Kubebuilder — ForensicCapture and EvidenceBundle CRDs
+api/        Go — gRPC + REST API gateway
+analyzer/   Python — evidence analysis workers (Volatility3, YARA)
+console/    TypeScript + React + Vite — investigator SPA
+deploy/     Helm charts and Kubernetes manifests
+docs/       Architecture docs, ADRs, roadmap
 ```
 
 ## Roadmap
@@ -151,7 +177,9 @@ Kuvera is the Hindu deity of wealth, riches, and the guardian of the north — k
 
 ## Contributing
 
-Not yet open for contributions — pre-alpha and the architecture is still settling. Star the repo to follow along. Once we hit alpha, contribution guidelines will appear here.
+Not yet open for external contributions — pre-alpha and the architecture is still settling. Star the repo to follow along.
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the DCO sign-off requirement and branch naming convention that apply to all commits.
 
 ## Inspiration and prior art
 

@@ -8,9 +8,9 @@
 # discoverable before the real logic lands. Sibling tickets in EPIC-1 replace
 # each stub body with a real implementation:
 #
-#   build -> EPIC-1   test -> T1.6   lint -> T1.4 / T1.5
+#   build -> EPIC-1   test -> T1.6
 #
-# `clean` and the `dev-cluster` / `dev-cluster-down` targets (T1.3) are real.
+# `clean`, `dev-cluster`/`dev-cluster-down` (T1.3), and `lint` (T1.4) are real.
 
 SHELL := /usr/bin/env bash
 
@@ -22,6 +22,10 @@ SHELL := /usr/bin/env bash
 KIND_CLUSTER_NAME ?= kuvera-dev
 KIND_NODE_IMAGE   ?=
 export KIND_CLUSTER_NAME KIND_NODE_IMAGE
+
+# Go linter (T1.4). Override if golangci-lint lives outside $PATH, e.g.:
+#   make lint GOLANGCI_LINT=/usr/local/bin/golangci-lint
+GOLANGCI_LINT ?= golangci-lint
 
 .PHONY: help dev-cluster dev-cluster-down build test lint deploy-dev e2e clean
 
@@ -45,7 +49,9 @@ test: ## Run unit tests across all components (T1.6)
 	@echo "make test: not yet implemented (tracked in EPIC-1 / T1.6)"
 
 lint: ## Run all linters: Go (T1.4), Python and TypeScript (T1.5)
-	@echo "make lint: not yet implemented (tracked in EPIC-1 / T1.4, T1.5)"
+	@cd sensor   && $(GOLANGCI_LINT) run ./...
+	@cd operator && $(GOLANGCI_LINT) run ./...
+	@cd api      && $(GOLANGCI_LINT) run ./...
 
 deploy-dev: ## Install the Helm chart into the dev cluster
 	@echo "make deploy-dev: not yet implemented (tracked in EPIC-1)"

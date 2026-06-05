@@ -1,0 +1,56 @@
+name: DCO
+
+# Verify that every commit in a pull request carries a Signed-off-by trailer,
+# confirming the author's agreement with the Developer Certificate of Origin
+# (https://developercertificate.org/).
+#
+# Runs on every PR event so it re-checks when new commits are pushed.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  dco:
+    name: DCO sign-off check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Full history is needed to walk commits between base and head.
+          fetch-depth: 0
+
+      - name: Check every commit for Signed-off-by
+        run: |
+          set -euo pipefail
+
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+
+          missing=()
+          while IFS= read -r sha; do
+            body="$(git log -1 --format="%B" "$sha")"
+            # Accept any line matching: Signed-off-by: Name <email@domain>
+            if ! printf '%s' "$body" | grep -qE "^Signed-off-by: .+ <.+@.+>"; then
+              missing+=("$(git log -1 --format='%h %s' "$sha")")
+            fi
+          done < <(git log --format="%H" "${base}..${head}")
+
+          if [[ "${#missing[@]}" -gt 0 ]]; then
+            echo "::error::The following commits are missing a Signed-off-by trailer:"
+            for c in "${missing[@]}"; do
+              echo "  $c"
+            done
+            echo ""
+            echo "To add sign-off to the most recent commit:"
+            echo "  git commit --amend -s"
+            echo ""
+            echo "To sign off all commits in this branch:"
+            echo "  git rebase --signoff origin/${{ github.base_ref }}"
+            echo ""
+            echo "See CONTRIBUTING.md for details on the DCO requirement."
+            exit 1
+          fi
+
+          echo "All commits carry a valid Signed-off-by trailer. DCO check passed."

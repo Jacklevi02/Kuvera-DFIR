@@ -8,9 +8,10 @@
 # discoverable before the real logic lands. Sibling tickets in EPIC-1 replace
 # each stub body with a real implementation:
 #
-#   build -> EPIC-1   test -> T1.6
+#   build -> EPIC-1
 #
-# `clean`, `dev-cluster`/`dev-cluster-down` (T1.3), and `lint` (T1.4) are real.
+# `clean`, `dev-cluster`/`dev-cluster-down` (T1.3), `lint` (T1.4/T1.5), and
+# `test` (T1.6) are real.
 
 SHELL := /usr/bin/env bash
 
@@ -33,6 +34,13 @@ MYPY     ?= mypy
 ESLINT   ?= eslint
 PRETTIER ?= prettier
 
+# Test runners (T1.6). Override if tools live outside $PATH.
+# PYTEST exit 5 means "no tests collected" — valid on an empty scaffolding.
+GO     ?= go
+PYTEST ?= pytest
+# vitest is invoked via npx so any project-local install takes precedence.
+VITEST ?= npx --yes vitest
+
 .PHONY: help dev-cluster dev-cluster-down build test lint deploy-dev e2e clean
 
 help: ## List all available targets
@@ -52,7 +60,12 @@ build: ## Build all components (sensor, operator, api, analyzer, console)
 	@echo "make build: not yet implemented (tracked in EPIC-1)"
 
 test: ## Run unit tests across all components (T1.6)
-	@echo "make test: not yet implemented (tracked in EPIC-1 / T1.6)"
+	@cd sensor   && $(GO) test ./...
+	@cd operator && $(GO) test ./...
+	@cd api      && $(GO) test ./...
+	@cd analyzer && ($(PYTEST) || [ $$? -eq 5 ])
+	@cd console  && $(VITEST) run --passWithNoTests
+	@bash scripts/dev_cluster_config_test.sh
 
 lint: ## Run all linters: Go (T1.4), Python and TypeScript (T1.5)
 	@cd sensor   && $(GOLANGCI_LINT) run ./...

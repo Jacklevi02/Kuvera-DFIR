@@ -1,0 +1,23 @@
+{
+  "name": "kuvera-console",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Kuvera forensics console SPA",
+  "scripts": {
+    "lint": "eslint src",
+    "format:check": "prettier --check src",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^10.1.0",
+    "prettier": "^3.0.0",
+    "typescript": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

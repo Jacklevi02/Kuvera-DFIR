@@ -65,5 +65,25 @@ fail the DCO check and cannot be merged until the commits are amended.
 
 ## Branch naming
 
-See `docs/PROJECT-MANAGEMENT.md` for the branch naming convention and the
-label taxonomy used in this repository.
+Branches are named after the GitHub issue they implement:
+
+```
+<issue-number>-<ticket-id>-<component>-<slug>
+```
+
+Examples:
+
+```
+4-t11-infra-scaffold-monorepo-directory-structure
+10-t17-infra-github-actions-ci-lint-test-on-every-pr
+```
+
+Where:
+- `<issue-number>` is the GitHub issue number
+- `<ticket-id>` is the sprint ticket identifier in lowercase (e.g. `t11`, `t17`)
+- `<component>` is the component label (infra, sensor, operator, api, analyzer, console, deploy, docs)
+- `<slug>` is a kebab-case description of the change
+
+No commits directly to `main` or `dev`. Every change goes through a branch and a pull request.
+
+See [docs/PROJECT-MANAGEMENT.md](./docs/PROJECT-MANAGEMENT.md) for the full label taxonomy and workflow conventions.

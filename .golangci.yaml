@@ -1,0 +1,56 @@
+# golangci-lint v2 configuration for Kuvera.
+#
+# Each Go module (sensor/, operator/, api/) is linted from its own directory
+# so golangci-lint resolves its go.mod correctly.  Walking up the directory
+# tree to find this root config means all modules share a single rule set.
+#
+# Linter selection follows the conventions in CLAUDE.md:
+#   errcheck, govet, staticcheck, ineffassign, unused  (via default: standard)
+#   gosec    — security issue detection (G-class rules)
+#   revive   — idiomatic Go style, drop-in golint replacement
+#   sloglint — consistent log/slog call style (used project-wide)
+#
+# In golangci-lint v2, gofmt and goimports are "formatters", not linters;
+# they live under the `formatters` key rather than `linters.enable`.
+version: "2"
+
+run:
+  timeout: 5m
+  # Pin to the Go version used across all modules in this repo.
+  go: "1.24"
+
+linters:
+  # "standard" enables: errcheck, govet, staticcheck, ineffassign, unused.
+  default: standard
+  enable:
+    - gosec    # surface security-sensitive patterns (G-prefix rules)
+    - revive   # idiomatic Go style; drop-in replacement for golint
+    - sloglint # enforce consistent log/slog call style (used throughout)
+
+  settings:
+    revive:
+      rules:
+        # Require every exported identifier to carry a doc comment.
+        - name: exported
+          arguments:
+            # Allow stuttering names (e.g. forensics.ForensicsCapture) during
+            # the early scaffolding phase; revisit once package names stabilise.
+            - disableStutteringCheck
+
+    gosec:
+      # G304 flags file-path arguments constructed from variables. That is
+      # intentional in forensics code where paths come from evidence targets —
+      # suppress the noise here, but keep the rest of gosec enabled.
+      excludes:
+        - G304
+
+formatters:
+  enable:
+    - gofmt     # enforce canonical Go formatting
+    - goimports # enforce import grouping and ordering
+
+issues:
+  # Raise the per-linter ceiling so a first pass surfaces everything rather
+  # than silently capping output.
+  max-issues-per-linter: 0
+  max-same-issues: 0

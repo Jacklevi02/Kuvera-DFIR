@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"io"
 	"log/slog"
 	"testing"
 	"time"
@@ -11,7 +10,8 @@ import (
 func TestRunShutsDownOnContextCancel(t *testing.T) {
 	t.Parallel()
 
-	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
+	// slog.DiscardHandler is the zero-allocation discard handler added in Go 1.24.
+	logger := slog.New(slog.DiscardHandler)
 	ctx, cancel := context.WithCancel(context.Background())
 
 	done := make(chan error, 1)

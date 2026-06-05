@@ -27,6 +27,12 @@ export KIND_CLUSTER_NAME KIND_NODE_IMAGE
 #   make lint GOLANGCI_LINT=/usr/local/bin/golangci-lint
 GOLANGCI_LINT ?= golangci-lint
 
+# Python and TypeScript linters (T1.5). Override if tools live outside $PATH.
+RUFF     ?= ruff
+MYPY     ?= mypy
+ESLINT   ?= eslint
+PRETTIER ?= prettier
+
 .PHONY: help dev-cluster dev-cluster-down build test lint deploy-dev e2e clean
 
 help: ## List all available targets
@@ -52,6 +58,10 @@ lint: ## Run all linters: Go (T1.4), Python and TypeScript (T1.5)
 	@cd sensor   && $(GOLANGCI_LINT) run ./...
 	@cd operator && $(GOLANGCI_LINT) run ./...
 	@cd api      && $(GOLANGCI_LINT) run ./...
+	@cd analyzer && $(RUFF) check .
+	@cd analyzer && $(MYPY) --strict kuvera_analyzer/
+	@cd console  && $(ESLINT) --no-error-on-unmatched-pattern "src/**/*.{ts,tsx}"
+	@cd console  && $(PRETTIER) --check "src/**/*.{ts,tsx,css}" --no-error-on-unmatched-pattern
 
 deploy-dev: ## Install the Helm chart into the dev cluster
 	@echo "make deploy-dev: not yet implemented (tracked in EPIC-1)"

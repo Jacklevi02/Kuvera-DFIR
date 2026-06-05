@@ -6,7 +6,8 @@
   "scripts": {
     "lint": "eslint src",
     "format:check": "prettier --check src",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",

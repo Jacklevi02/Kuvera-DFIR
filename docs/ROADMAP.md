@@ -1,7 +1,7 @@
 # Kuvera Roadmap
 
 This document is the durable, version-controlled view of the Kuvera MVP roadmap.
-For live ticket state, see the [Kuvera GitHub Project](https://github.com/users/<owner>/projects/<n>).
+For live ticket state, see the [Kuvera GitHub Project](https://github.com/users/Jacklevi02/projects/4).
 
 **MVP target:** 03 October 2026  
 **Sprint length:** 3 weeks  
@@ -13,7 +13,7 @@ For live ticket state, see the [Kuvera GitHub Project](https://github.com/users/
 |--------|---------------------------|--------------------------------------|
 | 1      | 01 Jun – 20 Jun 2026       | Foundations & eBPF hello world       |
 | 2      | 21 Jun – 11 Jul 2026       | Sensor as DaemonSet + event pipeline |
-| 3      | 12 Jul – 01 Aug 2026       | Operator skeleton + ForensicCapture  |
+| 3      | 12 Jul – 01 Aug 2026       | Operator skeleton + ForensicCapture CRD |
 | 4      | 02 Aug – 22 Aug 2026       | Real capture + chain of custody      |
 | 5      | 23 Aug – 12 Sep 2026       | API gateway + analyzer + timeline    |
 | 6      | 13 Sep – 03 Oct 2026       | Console + end-to-end MVP             |

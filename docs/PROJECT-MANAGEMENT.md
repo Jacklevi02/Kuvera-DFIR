@@ -8,7 +8,7 @@ For product spec, see `PROJECT.md`.
 
 ## Source of truth
 
-- **Live ticket state, sprint membership, status, dates:** the [Kuvera GitHub Project](https://github.com/users/Jacklevi02/projects) (Project items are canonical).
+- **Live ticket state, sprint membership, status, dates:** the [Kuvera GitHub Project](https://github.com/users/Jacklevi02/projects/4) (Project items are canonical).
 - **Roadmap, sprint goals, acceptance criteria, Gantt:** `docs/ROADMAP.md` in this repo.
 - **Coding conventions, architecture rules:** `CLAUDE.md` in this repo.
 - **Definition of Done, project conventions:** this file.

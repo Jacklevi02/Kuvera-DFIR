@@ -157,7 +157,7 @@ A sprint is closed when:
 ## Workflow conventions
 
 1. No commits to `main` directly. Feature branches and PRs only.
-2. Branch naming: `<type>/<short-description>` — e.g. `feature/sensor-execve`, `fix/operator-rbac`, `chore/bump-go-version`.
+2. Branch naming: `<issue-number>-<ticket-id>-<component>-<slug>` — e.g. `4-t11-infra-scaffold-monorepo-directory-structure`, `10-t17-infra-github-actions-ci-lint-test-on-every-pr`. This mirrors the GitHub default branch name created from an issue and keeps branches sortable by issue number.
 3. PR descriptions reference the issue: `Closes #42`.
 4. Chain-of-custody-touching PRs must state so explicitly in the description.
 5. DCO sign-off required on every commit. No CLA.

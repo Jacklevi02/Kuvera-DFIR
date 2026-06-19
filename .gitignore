@@ -8,6 +8,11 @@
 bin/
 dist/
 
+# go build ./... deposits named binaries at the module root
+sensor/sensor
+operator/operator
+api/api
+
 # Test binaries and coverage
 *.test
 *.out

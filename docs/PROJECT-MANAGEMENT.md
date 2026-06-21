@@ -33,17 +33,17 @@ The project uses a single GitHub Project of type "Team" to support iterations an
 
 ### Custom fields
 
-| Field | Type | Values |
-|---|---|---|
-| Status | Single-select (built-in) | Backlog, Todo, In Progress, In Review, Done, Blocked |
-| Sprint | Iteration | Sprint 1 (01 Jun 2026, 3w), Sprint 2 (21 Jun 2026, 3w), Sprint 3 (12 Jul 2026, 3w), Sprint 4 (02 Aug 2026, 3w), Sprint 5 (23 Aug 2026, 3w), Sprint 6 (13 Sep 2026, 3w) |
-| Component | Single-select | sensor, operator, api, analyzer, console, deploy, docs, infra |
-| Type | Single-select | epic, feature, task, spike, chore, bug |
-| Estimate | Single-select | 0.5d, 1d, 2d, 3d, 5d |
-| Start date | Date | — |
-| Target date | Date | — |
-| Priority | Single-select | P0, P1, P2 |
-| Chain-of-custody touched | Boolean | true / false |
+| Field                    | Type                     | Values                                                        |
+| ------------------------ | ------------------------ | ------------------------------------------------------------- |
+| Status                   | Single-select (built-in) | Backlog, Todo, In Progress, In Review, Done, Blocked          |
+| Sprint                   | Iteration                | Sprint 1, Sprint 2, Sprint 3, Sprint 4, Sprint 5, Sprint 6    |
+| Component                | Single-select            | sensor, operator, api, analyzer, console, deploy, docs, infra |
+| Type                     | Single-select            | epic, feature, task, spike, chore, bug                        |
+| Estimate                 | Single-select            | 0.5d, 1d, 2d, 3d, 5d                                          |
+| Start date               | Date                     | —                                                             |
+| Target date              | Date                     | —                                                             |
+| Priority                 | Single-select            | P0, P1, P2                                                    |
+| Chain-of-custody touched | Boolean                  | true / false                                                  |
 
 ### Field usage rules
 
@@ -55,14 +55,14 @@ The project uses a single GitHub Project of type "Team" to support iterations an
 
 ### Views
 
-| View | Layout | Grouping | Filter | Sort |
-|---|---|---|---|---|
-| Current Sprint | Board | Status | Sprint = @current | Priority asc |
-| Roadmap | Roadmap | Component | — | Start date asc |
-| All Epics | Table | Sprint | Type = epic | Sprint asc |
-| By Component | Board | Component | Sprint = @current | — |
-| Backlog | Table | Component | Sprint is empty | Priority asc |
-| Chain-of-Custody Watch | Table | Sprint | Chain-of-custody touched = true | Sprint asc |
+| View                   | Layout  | Grouping  | Filter                          | Sort           |
+| ---------------------- | ------- | --------- | ------------------------------- | -------------- |
+| Current Sprint         | Board   | Status    | Sprint = @current               | Priority asc   |
+| Roadmap                | Roadmap | Component | —                               | Start date asc |
+| All Epics              | Table   | Sprint    | Type = epic                     | Sprint asc     |
+| By Component           | Board   | Component | Sprint = @current               | —              |
+| Backlog                | Table   | Component | Sprint is empty                 | Priority asc   |
+| Chain-of-Custody Watch | Table   | Sprint    | Chain-of-custody touched = true | Sprint asc     |
 
 ## Label taxonomy
 
@@ -70,53 +70,53 @@ Labels mirror the Project's `Component` and `Type` fields so they are visible on
 
 ### Component labels
 
-| Label | Colour | Used for |
-|---|---|---|
-| `component:sensor` | `#1d76db` | eBPF DaemonSet work |
-| `component:operator` | `#0e8a16` | Kubernetes operator and CRDs |
-| `component:api` | `#5319e7` | gRPC + REST API gateway |
-| `component:analyzer` | `#fbca04` | Python analyzer workers |
-| `component:console` | `#e99695` | TypeScript + React frontend |
-| `component:deploy` | `#c5def5` | Helm charts, manifests, dev cluster |
-| `component:docs` | `#bfd4f2` | Markdown docs, ADRs, READMEs |
-| `component:infra` | `#d4c5f9` | CI, Makefile, tooling, lint config |
+| Label                | Colour    | Used for                            |
+| -------------------- | --------- | ----------------------------------- |
+| `component:sensor`   | `#1d76db` | eBPF DaemonSet work                 |
+| `component:operator` | `#0e8a16` | Kubernetes operator and CRDs        |
+| `component:api`      | `#5319e7` | gRPC + REST API gateway             |
+| `component:analyzer` | `#fbca04` | Python analyzer workers             |
+| `component:console`  | `#e99695` | TypeScript + React frontend         |
+| `component:deploy`   | `#c5def5` | Helm charts, manifests, dev cluster |
+| `component:docs`     | `#bfd4f2` | Markdown docs, ADRs, READMEs        |
+| `component:infra`    | `#d4c5f9` | CI, Makefile, tooling, lint config  |
 
 ### Type labels
 
-| Label | Colour | Used for |
-|---|---|---|
-| `type:epic` | `#3e4b9e` | Sprint-sized parent issues with sub-issues |
-| `type:feature` | `#a2eeef` | New user-facing capability |
-| `type:task` | `#cccccc` | Default. A concrete unit of work, 0.5d–2d |
-| `type:spike` | `#f9d0c4` | Timeboxed investigation, output is a written finding |
-| `type:chore` | `#ededed` | Cleanup, refactor, dependency bumps |
-| `type:bug` | `#d73a4a` | Something is broken |
+| Label          | Colour    | Used for                                             |
+| -------------- | --------- | ---------------------------------------------------- |
+| `type:epic`    | `#3e4b9e` | Sprint-sized parent issues with sub-issues           |
+| `type:feature` | `#a2eeef` | New user-facing capability                           |
+| `type:task`    | `#cccccc` | Default. A concrete unit of work, 0.5d–2d            |
+| `type:spike`   | `#f9d0c4` | Timeboxed investigation, output is a written finding |
+| `type:chore`   | `#ededed` | Cleanup, refactor, dependency bumps                  |
+| `type:bug`     | `#d73a4a` | Something is broken                                  |
 
 ### Priority labels
 
-| Label | Colour | Meaning |
-|---|---|---|
+| Label         | Colour    | Meaning                          |
+| ------------- | --------- | -------------------------------- |
 | `priority:p0` | `#b60205` | Blocks the MVP. Drop everything. |
-| `priority:p1` | `#d93f0b` | Blocks the current sprint. |
-| `priority:p2` | `#fbca04` | Should fix when convenient. |
+| `priority:p1` | `#d93f0b` | Blocks the current sprint.       |
+| `priority:p2` | `#fbca04` | Should fix when convenient.      |
 
 ### Special labels
 
-| Label | Colour | Used for |
-|---|---|---|
+| Label              | Colour    | Used for                                                                                                       |
+| ------------------ | --------- | -------------------------------------------------------------------------------------------------------------- |
 | `chain-of-custody` | `#000000` | Touches capture, sealing, hashing, signing, or transparency log. Requires extra review per `CLAUDE.md` rule 4. |
-| `good-first-issue` | `#7057ff` | Reserved for post-MVP when the repo opens to contributors. |
+| `good-first-issue` | `#7057ff` | Reserved for post-MVP when the repo opens to contributors.                                                     |
 
 ## Issue templates
 
 Templates live in `.github/ISSUE_TEMPLATE/`. Blank issues are disabled to enforce structure.
 
-| Template | File | Use for |
-|---|---|---|
-| Epic | `epic.yml` | Sprint-sized work with multiple sub-issues. One epic = one sprint goal area. |
-| Task | `task.yml` | Default. A concrete unit of work, 0.5d–2d, linked to a parent epic. |
-| Spike | `spike.yml` | Timeboxed investigation. Output is a written finding (comment or ADR). |
-| Bug | `bug.yml` | Something is broken. |
+| Template | File        | Use for                                                                      |
+| -------- | ----------- | ---------------------------------------------------------------------------- |
+| Epic     | `epic.yml`  | Sprint-sized work with multiple sub-issues. One epic = one sprint goal area. |
+| Task     | `task.yml`  | Default. A concrete unit of work, 0.5d–2d, linked to a parent epic.          |
+| Spike    | `spike.yml` | Timeboxed investigation. Output is a written finding (comment or ADR).       |
+| Bug      | `bug.yml`   | Something is broken.                                                         |
 
 All templates require:
 

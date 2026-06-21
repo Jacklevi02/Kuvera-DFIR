@@ -119,13 +119,12 @@ open http://localhost:8080
 
 ### Documentation
 
-| Document | What it covers |
-|----------|---------------|
-| [PROJECT.md](./PROJECT.md) | Full product spec: capabilities, architecture, CRDs, MVP scope, post-MVP roadmap |
-| [CLAUDE.md](./CLAUDE.md) | Coding conventions, architecture rules, component layout, and what to push back on |
-| [docs/ROADMAP.md](./docs/ROADMAP.md) | Sprint schedule, per-sprint goals, and Gantt chart |
-| [docs/PROJECT-MANAGEMENT.md](./docs/PROJECT-MANAGEMENT.md) | Project board schema, label taxonomy, workflow conventions, and branch naming |
-| [CONTRIBUTING.md](./CONTRIBUTING.md) | DCO sign-off requirement, pre-alpha status, branch naming |
+| Document                                                   | What it covers                                                                     |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| [PROJECT.md](./PROJECT.md)                                 | Full product spec: capabilities, architecture, CRDs, MVP scope, post-MVP roadmap   |
+| [CLAUDE.md](./CLAUDE.md)                                   | Coding conventions, architecture rules, component layout, and what to push back on |
+| [docs/PROJECT-MANAGEMENT.md](./docs/PROJECT-MANAGEMENT.md) | Project board schema, label taxonomy, workflow conventions, and branch naming      |
+| [CONTRIBUTING.md](./CONTRIBUTING.md)                       | DCO sign-off requirement, pre-alpha status, branch naming                          |
 
 ### Prerequisites
 
@@ -153,18 +152,6 @@ deploy/     Helm charts and Kubernetes manifests
 docs/       Architecture docs, ADRs, roadmap
 ```
 
-## Roadmap
-
-**Milestone 1 — Capture (MVP):** eBPF sensor, operator, basic filesystem capture, chain of custody, minimal console.
-
-**Milestone 2 — Analyze:** Volatility integration, YARA scanning, IOC matching, richer timeline.
-
-**Milestone 3 — Cloud:** AWS EBS / GCP PD / Azure Managed Disk snapshot integration, cloud audit log correlation.
-
-**Milestone 4 — Scale:** Multi-cluster federation, RBAC, SSO, compliance reports (DORA, SOC2, HIPAA).
-
-**Milestone 5 — Ecosystem:** SIEM/SOAR integrations, detection-tool webhooks (Falco, Tetragon, Wiz), managed cloud version.
-
 ## Licensing
 
 Apache 2.0 for the core (sensor, operator, basic analyzer, basic console).
@@ -173,7 +160,7 @@ Future commercial enterprise features (multi-cluster, SSO, compliance reporting,
 
 ## Why "Kuvera"?
 
-Kuvera is the Hindu deity of wealth, riches, and the guardian of the north — keeper of treasure. In digital forensics, evidence *is* treasure. We guard it.
+Kuvera is the Hindu deity of wealth, riches, and the guardian of the north — keeper of treasure. In digital forensics, evidence _is_ treasure. We guard it.
 
 ## Contributing
 

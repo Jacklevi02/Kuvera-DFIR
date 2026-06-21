@@ -21,7 +21,7 @@ Today, when an incident is detected, responders must:
 
 This takes hours. Attackers take minutes. The evidence is gone.
 
-Existing point solutions do not close the gap. Velociraptor is endpoint-focused and not Kubernetes-native. Cado Security is a closed commercial product. Tracee and Tetragon are excellent eBPF *detection* tools but do not perform post-incident *forensic capture* with chain of custody. Kuvera fills this gap as a Kubernetes-native, self-managed platform that internal SOCs and MDR providers can deploy and operate themselves.
+Existing point solutions do not close the gap. Velociraptor is endpoint-focused and not Kubernetes-native. Cado Security is a closed commercial product. Tracee and Tetragon are excellent eBPF _detection_ tools but do not perform post-incident _forensic capture_ with chain of custody. Kuvera fills this gap as a Kubernetes-native, self-managed platform that internal SOCs and MDR providers can deploy and operate themselves.
 
 ## The product
 
@@ -160,14 +160,14 @@ The MVP proves the core thesis: forensic evidence can be captured from a comprom
 
 ## Competitive landscape
 
-| Tool | What it does | Where Kuvera differs |
-|---|---|---|
-| Velociraptor | Open-source endpoint DFIR | Endpoint-focused, not K8s-native, no eBPF |
-| Cado Security | Cloud forensics SaaS | Closed source, expensive, AWS-first |
-| Tracee / Tetragon / Falco | Runtime detection via eBPF | Detection, not forensics; no chain of custody; no investigation workflow |
-| Sysdig / Wiz | Cloud security platforms | Detection-and-posture, light on deep forensics; very expensive |
-| GRR | Endpoint forensics (Google) | Not maintained; not cloud-native |
-| Mitiga | Cloud IR services + platform | Services-led, expensive, closed |
+| Tool                      | What it does                 | Where Kuvera differs                                                     |
+| ------------------------- | ---------------------------- | ------------------------------------------------------------------------ |
+| Velociraptor              | Open-source endpoint DFIR    | Endpoint-focused, not K8s-native, no eBPF                                |
+| Cado Security             | Cloud forensics SaaS         | Closed source, expensive, AWS-first                                      |
+| Tracee / Tetragon / Falco | Runtime detection via eBPF   | Detection, not forensics; no chain of custody; no investigation workflow |
+| Sysdig / Wiz              | Cloud security platforms     | Detection-and-posture, light on deep forensics; very expensive           |
+| GRR                       | Endpoint forensics (Google)  | Not maintained; not cloud-native                                         |
+| Mitiga                    | Cloud IR services + platform | Services-led, expensive, closed                                          |
 
 The gap is real: no project owns "open-core, Kubernetes-native, chain-of-custody-correct forensics."
 
@@ -187,20 +187,6 @@ DCO sign-off is required on every commit. No CLA.
 - **CRIU for memory dumping.** Fragile. Deferred to v2.
 - **Liability.** Chain of custody is a legal claim. Documentation must be precise. Claims of court admissibility require legal review before any public statement.
 - **Open-core balance.** The open source version must remain genuinely useful. Gutting it to drive commercial sales would destroy adoption and community trust.
-
-## Build sequence
-
-**Week 1:** eBPF "hello world" running on a Kubernetes node. Capture `execve` events for a single pod and print them.
-
-**Weeks 2–3:** Wrap as a DaemonSet. Ship events over a UNIX socket to a userspace collector. Ring-buffer them.
-
-**Weeks 4–6:** Build the operator skeleton with Kubebuilder. Define the `ForensicCapture` CRD. Wire up "when a CR is created, do nothing useful but log it."
-
-**Weeks 7–9:** Operator performs real capture: pause container via CRI, tar the filesystem, hash it, drop the bundle in SeaweedFS.
-
-**Weeks 10–12:** Minimal console: list captures, view bundle metadata, render the event timeline as a table.
-
-That completes the vertical slice. Iterate from there.
 
 ## Prior art
 

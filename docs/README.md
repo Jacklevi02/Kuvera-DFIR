@@ -5,7 +5,6 @@ for the Kuvera DFIR platform.
 
 ## Contents
 
-- `ROADMAP.md` — sprint schedule and MVP acceptance criteria
 - `PROJECT-MANAGEMENT.md` — project management process
 
 ## Planned additions

@@ -1,0 +1,29 @@
+# Kuvera toolchain — the single source of truth for every tool version except
+# Python and uv.
+#
+#   mise install    install/refresh everything
+#   mise outdated   check for newer releases
+#
+# CI reads this file via jdx/mise-action, so a bump here is a bump everywhere.
+#
+# Python and uv are deliberately NOT here. uv is installed standalone and
+# manages the Python interpreter itself: the uv version is pinned by
+# `[tool.uv] required-version` in analyzer/pyproject.toml and the interpreter
+# by analyzer/.python-version. Library versions live in go.mod,
+# analyzer/pyproject.toml and console/package.json. See docs/TOOLCHAIN.md.
+
+[tools]
+go   = "1.27"
+node = "24"
+pnpm = "11"
+
+# Go linting. No Go manifest pins this, so mise does.
+golangci-lint = "2.13"
+
+# Kubernetes dev cluster (make dev-cluster).
+kind    = "0.32"
+kubectl = "1.36"
+helm    = "4.2"
+
+# protobuf/gRPC codegen for api/proto and the generated console client.
+buf = "1.72"

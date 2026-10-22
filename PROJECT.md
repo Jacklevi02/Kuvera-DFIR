@@ -67,7 +67,7 @@ The stack is fixed. Each choice is deliberate. Contributors should not introduce
 
 **Analyzer workers**
 
-- Language: Python 3.12+.
+- Language: Python.
 - Rationale: Volatility3 is Python. YARA has its best bindings in Python. The forensics ecosystem (plaso, dfvfs, libforensic-artifacts) is overwhelmingly Python.
 - Orchestration: a job queue backed by NATS JetStream, with workers running as Kubernetes Jobs.
 
@@ -78,7 +78,7 @@ The stack is fixed. Each choice is deliberate. Contributors should not introduce
 
 **Console (web UI)**
 
-- Language: TypeScript with React 19+ and Vite 8.
+- Language: TypeScript with React and Vite.
 - UI: shadcn/ui components, TanStack Query for server state, TanStack Router for routing.
 - Forms: react-hook-form + zod.
 - Visualization: a timeline component built on visx or vis-timeline; a graph view for blast radius using Cytoscape.js or react-flow.

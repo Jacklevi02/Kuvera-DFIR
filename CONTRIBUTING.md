@@ -63,6 +63,40 @@ fail the DCO check and cannot be merged until the commits are amended.
 
 ---
 
+## Toolchain
+
+Tool versions are managed with [mise](https://mise.jdx.dev). `mise.toml` is the
+single source of truth for Go, Node.js, pnpm, golangci-lint, kind, kubectl, Helm,
+and buf — do not pin those anywhere else.
+
+Python and uv are the exception and are **not** managed by mise. Install
+[uv](https://docs.astral.sh/uv/getting-started/installation/) standalone; uv then
+installs and manages the Python interpreter. The uv version is pinned by
+`[tool.uv] required-version` in `analyzer/pyproject.toml`, the interpreter by
+`analyzer/.python-version`.
+
+```bash
+mise install                        # Go, Node, pnpm, golangci-lint, kind, kubectl, helm, buf
+cd analyzer && uv sync              # Python interpreter + dev dependencies (via uv)
+cd console  && pnpm install         # console dependencies
+```
+
+Besides uv, the one thing mise does not install is a container runtime — Docker and Podman
+are both supported, and `kind` needs one to host the dev cluster nodes.
+[docs/DEVELOPMENT-SETUP.md](./docs/DEVELOPMENT-SETUP.md) walks through setup from
+a clean machine, including runtime install steps per platform.
+
+**pnpm only** for the console — no npm, no yarn. **uv only** for the analyzer —
+never `pip install`. Both lockfiles (`console/pnpm-lock.yaml`,
+`analyzer/uv.lock`) are committed and CI installs from them.
+
+Before opening a PR, `make lint` and `make test` must both pass.
+
+See [docs/TOOLCHAIN.md](./docs/TOOLCHAIN.md) for what each tool is for, where
+every version is pinned, and how to add a new tool to `mise.toml`.
+
+---
+
 ## Branch naming
 
 Branches are named after the GitHub issue they implement:

@@ -6,6 +6,10 @@ for the Kuvera DFIR platform.
 ## Contents
 
 - `PROJECT-MANAGEMENT.md` — project management process
+- `TOOLCHAIN.md` — which tools the project uses, where each version is pinned,
+  and how to add a new one
+- `DEVELOPMENT-SETUP.md` — clean-machine setup: mise, uv, Docker or Podman, first
+  dev cluster, troubleshooting
 
 ## Planned additions
 

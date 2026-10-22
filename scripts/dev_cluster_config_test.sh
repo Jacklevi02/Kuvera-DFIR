@@ -31,11 +31,19 @@ for s in scripts/dev-cluster.sh scripts/dev-cluster-verify.sh scripts/dev_cluste
 done
 
 echo "==> validating $config"
-if ! command -v python3 >/dev/null 2>&1; then
-	echo "  FAIL: python3 is required to validate the kind config"
+# Resolve an interpreter that actually has PyYAML. A bare `python3` may be a
+# clean interpreter with no third-party packages, so prefer `uv run` (uv is a
+# required repo tool — see docs/TOOLCHAIN.md) and fall back to a system python3
+# that already ships PyYAML.
+if command -v uv >/dev/null 2>&1; then
+	PY_RUN=(uv run --quiet --with pyyaml python3)
+elif command -v python3 >/dev/null 2>&1 && python3 -c "import yaml" >/dev/null 2>&1; then
+	PY_RUN=(python3)
+else
+	echo "  FAIL: need uv, or a python3 with PyYAML, to validate the kind config"
 	exit 1
 fi
-if python3 - "$config" <<'PY'; then
+if "${PY_RUN[@]}" - "$config" <<'PY'; then
 import sys
 
 import yaml

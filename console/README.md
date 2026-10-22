@@ -15,14 +15,15 @@ browser, and chain-of-custody log.
 ```
 console/
 ├── src/            # React application source
-├── package.json    # npm dependencies (managed via npm/pnpm)
+├── package.json    # console dependencies (managed with pnpm)
+├── pnpm-lock.yaml  # committed lockfile — CI installs with --frozen-lockfile
 └── vite.config.ts  # Vite build configuration
 ```
 
 ## Stack
 
-- TypeScript 6.0+, strict mode, `noUncheckedIndexedAccess`
-- React 19+, functional components and hooks
+- TypeScript, strict mode, `noUncheckedIndexedAccess`
+- React, functional components and hooks
 - TanStack Query for server state, TanStack Router for routing
 - Tailwind CSS + shadcn/ui components
 - react-hook-form + zod for forms
@@ -31,18 +32,27 @@ console/
 
 ## Setup
 
+**pnpm only** — no npm, no yarn.
+
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 ## Testing
 
 ```bash
-npm test
-npm run lint
-npm run typecheck
+pnpm test
+pnpm run lint
+pnpm run format:check
+pnpm run typecheck
 ```
+
+`pnpm run typecheck` fails with `TS18003` while `src/` is empty scaffolding, so it
+is not wired into `make lint` yet — add it there once the first `.tsx` file lands.
+
+Node.js and pnpm versions come from `mise.toml`; everything else from
+`package.json`. See [docs/TOOLCHAIN.md](../docs/TOOLCHAIN.md).
 
 ## Architecture note
 

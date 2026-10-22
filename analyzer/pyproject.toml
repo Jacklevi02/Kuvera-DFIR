@@ -9,13 +9,19 @@ description = "Kuvera evidence analysis workers"
 requires-python = ">=3.12"
 dependencies = []
 
-[project.optional-dependencies]
+[dependency-groups]
+# Installed by default with `uv sync`, so `uv run` never drops them.
 dev = [
-    "ruff>=0.15",
-    "mypy>=1.19",
-    "pytest>=8",
-    "structlog>=24",
+    "ruff>=0.16.4",
+    "mypy>=2.3",
+    "pytest>=9.1",
+    "structlog>=26.1",
 ]
+
+[tool.uv]
+# uv is installed standalone, not by mise. This is its only version pin;
+# astral-sh/setup-uv reads it in CI.
+required-version = ">=0.13,<0.14"
 
 [tool.ruff]
 target-version = "py312"

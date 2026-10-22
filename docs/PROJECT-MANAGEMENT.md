@@ -2,18 +2,20 @@
 
 This document describes how the Kuvera project is run on GitHub: the Project board schema, label taxonomy, sprint cadence, Definition of Done, and issue template index. It is the authoritative reference for project management conventions.
 
-For the roadmap itself (sprint dates, goals, Gantt), see `docs/ROADMAP.md`.  
+For the roadmap itself (sprint dates, goals, Gantt), see the [Kuvera GitHub Project](https://github.com/users/Jacklevi02/projects/4) Roadmap view and the [sprint milestones](https://github.com/Jacklevi02/Kuvera-DFIR/milestones).  
 For coding conventions, see `CLAUDE.md`.  
 For product spec, see `PROJECT.md`.
 
 ## Source of truth
 
 - **Live ticket state, sprint membership, status, dates:** the [Kuvera GitHub Project](https://github.com/users/Jacklevi02/projects/4) (Project items are canonical).
-- **Roadmap, sprint goals, acceptance criteria, Gantt:** `docs/ROADMAP.md` in this repo.
+- **Sprint goals:** the sprint [milestones](https://github.com/Jacklevi02/Kuvera-DFIR/milestones) (one per sprint, due on the sprint's last day).
+- **Acceptance criteria:** each epic and task issue.
+- **Gantt:** the Project's Roadmap view, driven by each item's Start date and Target date.
 - **Coding conventions, architecture rules:** `CLAUDE.md` in this repo.
 - **Definition of Done, project conventions:** this file.
 
-If the Project and `docs/ROADMAP.md` disagree on a ticket, the Project wins. If they disagree on a sprint goal or acceptance criterion, the roadmap wins.
+If this file and the Project disagree on a date, the Project wins. If an issue and its milestone disagree on a sprint goal, the milestone wins.
 
 ## Repository
 
@@ -21,11 +23,23 @@ If the Project and `docs/ROADMAP.md` disagree on a ticket, the Project wins. If 
 
 ## Sprint cadence
 
-- Sprint length: 3 weeks.
-- Sprint week: Monday to Sunday.
-- The next sprint starts the Monday immediately following the previous sprint's Sunday.
-- MVP runs Sprint 1 through Sprint 6 (01 Jun – 03 Oct 2026).
-- Sprint dates and goals: see `docs/ROADMAP.md`.
+- Sprint length: 4 weeks (28 days).
+- Sprint week: Sunday to Saturday.
+- The next sprint starts the Sunday immediately following the previous sprint's Saturday.
+- MVP runs Sprint 1 through Sprint 6 (Sun 25 Oct 2026 – Sat 10 Apr 2027).
+
+| Sprint   | Starts (Sunday) | Ends (Saturday) |
+| -------- | --------------- | --------------- |
+| Sprint 1 | 25 Oct 2026     | 21 Nov 2026     |
+| Sprint 2 | 22 Nov 2026     | 19 Dec 2026     |
+| Sprint 3 | 20 Dec 2026     | 16 Jan 2027     |
+| Sprint 4 | 17 Jan 2027     | 13 Feb 2027     |
+| Sprint 5 | 14 Feb 2027     | 13 Mar 2027     |
+| Sprint 6 | 14 Mar 2027     | 10 Apr 2027     |
+
+These dates mirror the Project's `Sprint` iteration field and the milestone due dates. When the schedule moves, update all three together.
+
+- Sprint goals: see the [milestones](https://github.com/Jacklevi02/Kuvera-DFIR/milestones).
 
 ## GitHub Project schema
 

@@ -31,7 +31,15 @@ fi
 # 2. Config file is valid YAML
 # ---------------------------------------------------------------------------
 echo "==> .golangci.yaml is valid YAML"
-if python3 -c "import yaml, sys; yaml.safe_load(open('.golangci.yaml'))" 2>/dev/null; then
+# A bare `python3` may be a clean interpreter with no third-party packages, so
+# prefer `uv run` (uv is a required repo tool — see docs/TOOLCHAIN.md) and fall
+# back to a system python3 that already ships PyYAML.
+if command -v uv >/dev/null 2>&1; then
+    PY_RUN=(uv run --quiet --with pyyaml python3)
+else
+    PY_RUN=(python3)
+fi
+if "${PY_RUN[@]}" -c "import yaml; yaml.safe_load(open('.golangci.yaml'))" 2>/dev/null; then
     echo "  ok: YAML parses cleanly"
 else
     echo "  FAIL: .golangci.yaml is not valid YAML"

@@ -42,13 +42,13 @@ for module in sensor operator api; do
 done
 
 # ---------------------------------------------------------------------------
-# 3. pytest is available
+# 3. pytest is available through uv (version pinned in analyzer/pyproject.toml)
 # ---------------------------------------------------------------------------
-echo "==> pytest available"
-if command -v pytest >/dev/null 2>&1; then
-    echo "  ok: $(pytest --version 2>&1 | head -1)"
+echo "==> pytest available via uv"
+if (cd analyzer && uv run pytest --version >/dev/null 2>&1); then
+    echo "  ok: $(cd analyzer && uv run pytest --version 2>/dev/null | head -1)"
 else
-    echo "  FAIL: pytest not found in PATH"
+    echo "  FAIL: uv run pytest not available in analyzer/ (run: uv sync)"
     fail=1
 fi
 
@@ -56,7 +56,7 @@ fi
 # 4. pytest exits 0 or 5 (no tests collected) in analyzer/
 # ---------------------------------------------------------------------------
 echo "==> pytest exits 0 or 5 in analyzer/"
-if (cd analyzer && pytest >/dev/null 2>&1); then
+if (cd analyzer && uv run pytest >/dev/null 2>&1); then
     echo "  ok: pytest passed"
 else
     code=$?
@@ -69,24 +69,24 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# 5. vitest is reachable via npx
+# 5. vitest is reachable through pnpm (version pinned in console/package.json)
 # ---------------------------------------------------------------------------
-echo "==> vitest reachable via npx"
-if npx --yes vitest --version >/dev/null 2>&1; then
-    echo "  ok: vitest available via npx"
+echo "==> vitest reachable via pnpm"
+if (cd console && pnpm exec vitest --version >/dev/null 2>&1); then
+    echo "  ok: $(cd console && pnpm exec vitest --version 2>/dev/null | head -1)"
 else
-    echo "  FAIL: npx vitest not available"
+    echo "  FAIL: pnpm exec vitest not available in console/ (run: pnpm install)"
     fail=1
 fi
 
 # ---------------------------------------------------------------------------
-# 6. vitest exits 0 with --passWithNoTests in console/
+# 6. the console test script exits 0 on empty scaffolding
 # ---------------------------------------------------------------------------
-echo "==> vitest exits 0 with --passWithNoTests in console/"
-if (cd console && npx --yes vitest run --passWithNoTests >/dev/null 2>&1); then
-    echo "  ok: vitest passed"
+echo "==> pnpm run test exits 0 in console/"
+if (cd console && pnpm run test >/dev/null 2>&1); then
+    echo "  ok: pnpm run test passed"
 else
-    echo "  FAIL: vitest exited non-zero"
+    echo "  FAIL: pnpm run test exited non-zero"
     fail=1
 fi
 
@@ -101,8 +101,10 @@ else
     echo "  FAIL: go test not found in Makefile"
     fail=1
 fi
-for runner in pytest vitest; do
-    if grep -q "$runner" Makefile; then
+# Python and TypeScript runners are invoked through uv and pnpm so their
+# versions come from analyzer/pyproject.toml and console/package.json.
+for runner in '$(UV) run pytest' '$(PNPM) run test'; do
+    if grep -qF "$runner" Makefile; then
         echo "  ok: $runner referenced in Makefile"
     else
         echo "  FAIL: $runner not found in Makefile"

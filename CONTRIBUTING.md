@@ -67,7 +67,7 @@ fail the DCO check and cannot be merged until the commits are amended.
 
 Tool versions are managed with [mise](https://mise.jdx.dev). `mise.toml` is the
 single source of truth for Go, Node.js, pnpm, golangci-lint, kind, kubectl, Helm,
-and buf — do not pin those anywhere else.
+buf, and pre-commit — do not pin those anywhere else.
 
 Python and uv are the exception and are **not** managed by mise. Install
 [uv](https://docs.astral.sh/uv/getting-started/installation/) standalone; uv then
@@ -76,7 +76,7 @@ installs and manages the Python interpreter. The uv version is pinned by
 `analyzer/.python-version`.
 
 ```bash
-mise install                        # Go, Node, pnpm, golangci-lint, kind, kubectl, helm, buf
+mise install                        # Go, Node, pnpm, golangci-lint, kind, kubectl, helm, buf, pre-commit
 cd analyzer && uv sync              # Python interpreter + dev dependencies (via uv)
 cd console  && pnpm install         # console dependencies
 ```
@@ -94,6 +94,37 @@ Before opening a PR, `make lint` and `make test` must both pass.
 
 See [docs/TOOLCHAIN.md](./docs/TOOLCHAIN.md) for what each tool is for, where
 every version is pinned, and how to add a new tool to `mise.toml`.
+
+---
+
+## Pre-commit hooks (optional)
+
+Git hooks catch problems locally, before CI burns minutes on them. They are a
+convenience and not required: CI runs the same checks either way.
+
+```bash
+pre-commit install                  # once per clone
+```
+
+On each commit, the hooks check staged files only:
+
+| Hook                      | Checks                                  |
+| ------------------------- | --------------------------------------- |
+| gofmt + goimports         | Staged Go files, using `.golangci.yaml` |
+| ruff                      | Staged analyzer Python files            |
+| eslint                    | Staged console TypeScript files         |
+| prettier                  | Staged files in `console/src/`          |
+| no commits to main or dev | The current branch                      |
+
+The hooks report problems and do not rewrite files. To fix them, run
+`golangci-lint fmt` from the repo root, `uv run ruff check --fix` in `analyzer/`,
+or `pnpm exec eslint --fix src` and `pnpm exec prettier --write src` in `console/`.
+
+This is a subset of `make lint`, which also runs golangci-lint's linters and mypy.
+Both need more than the staged files to give correct results, so they stay out
+of the hooks. `pre-commit run --all-files` checks the whole repo, not only staged
+files. `pre-commit uninstall` removes the hook, and `git commit --no-verify`
+skips it for one commit.
 
 ---
 

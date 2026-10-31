@@ -10,7 +10,7 @@ need to know what version of something the project uses, read the file in the
 
 | Layer                | Tools                                                                                                                   | Pinned in                            |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| Toolchain / runtimes | Go, Node.js, pnpm, golangci-lint, kind, kubectl, Helm, buf                                                              | `mise.toml`                          |
+| Toolchain / runtimes | Go, Node.js, pnpm, golangci-lint, kind, kubectl, Helm, buf, pre-commit                                                  | `mise.toml`                          |
 | uv                   | uv itself (installed standalone, **not** by mise)                                                                       | `[tool.uv] required-version` in `analyzer/pyproject.toml` |
 | Python interpreter   | CPython, installed and managed by uv                                                                                    | `analyzer/.python-version`           |
 | Go modules           | `cilium/ebpf`, controller-runtime, grpc-gateway                                                                           | `sensor/`, `operator/`, `api/go.mod` |
@@ -24,7 +24,7 @@ installs from them with `pnpm install --frozen-lockfile` / `uv sync --locked`. G
 ## Getting set up
 
 ```bash
-mise install                        # Go, Node, pnpm, golangci-lint, kind, kubectl, helm, buf
+mise install                        # Go, Node, pnpm, golangci-lint, kind, kubectl, helm, buf, pre-commit
 cd analyzer && uv sync              # Python interpreter + ruff, mypy, pytest, structlog
 cd console  && pnpm install         # TypeScript, ESLint, Prettier, Vitest
 ```
@@ -52,6 +52,9 @@ clean machine, including Docker/Podman install and the eBPF host requirements.
   from `analyzer/.python-version`.
 - The Go language version in each `go.mod` tracks the `go` pin in `mise.toml`,
   as does `run.go` in `.golangci.yaml`. These three move together.
+- **`.pre-commit-config.yaml` pins nothing.** Every hook is `repo: local` and runs
+  the tool already pinned above, so a bump never needs a second edit.
+  `scripts/pre_commit_test.sh` fails if a `rev:` appears.
 - `analyzer/pyproject.toml` keeps a *lower bound* (`requires-python`,
   `ruff target-version`, `mypy python_version`) that is deliberately older than
   the interpreter in `analyzer/.python-version`. The floor is what the analyzer
@@ -77,6 +80,7 @@ clean machine, including Docker/Podman install and the eBPF host requirements.
 | **ESLint**        | console            | Lint (flat config)                                              |
 | **Prettier**      | console            | Format                                                          |
 | **buf**           | api, console       | Protobuf/gRPC codegen; the generated console API client         |
+| **pre-commit**    | all                | Optional local git hooks; see [CONTRIBUTING.md](../CONTRIBUTING.md#pre-commit-hooks-optional) |
 | **kind**          | deploy             | Local dev cluster with BTF and bpffs for eBPF                   |
 | **kubectl**       | deploy             | Cluster interaction                                             |
 | **Helm**          | deploy             | Chart packaging and install                                     |
@@ -135,7 +139,7 @@ mise use ubi:BurntSushi/ripgrep[exe=rg]
 ```
 
 Prefer `aqua:` where available — it verifies checksums, and several of this
-project's tools (pnpm, golangci-lint, kind, kubectl, helm, buf) resolve through
+project's tools (pnpm, golangci-lint, kind, kubectl, helm, buf, pre-commit) resolve through
 it already.
 
 ### Adding a library instead
@@ -170,6 +174,9 @@ documented in [DEVELOPMENT-SETUP.md](./DEVELOPMENT-SETUP.md) instead.
   plugin is just a binary. The daemon is not.
 - **`git`, `make`, `bash`.** `git` and `bash` are likewise absent from the mise
   registry. System tools, installed by your OS.
+- **`python3` for pre-commit.** The aqua build of pre-commit is a zipapp that needs
+  a system `python3` to start. That interpreter runs only pre-commit itself;
+  the analyzer still uses the one uv manages.
 - **The kernel.** BTF at `/sys/kernel/btf/vmlinux` is what makes CO-RE eBPF work,
   and cgroup v2 is what makes the dev cluster work. Nothing in userspace can
   install either.

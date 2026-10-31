@@ -3,15 +3,16 @@
 # Single entry point for building, testing, linting, and running Kuvera in a
 # local dev cluster (see CLAUDE.md, "Development workflow").
 #
-# Several targets are still stubs at this stage: they print a uniform
+# Two targets are still stubs at this stage: they print a uniform
 # "not yet implemented" message and exit 0 so the target graph is usable and
-# discoverable before the real logic lands. Sibling tickets in EPIC-1 replace
-# each stub body with a real implementation:
+# discoverable before the real logic lands. Later tickets replace each stub
+# body with a real implementation:
 #
-#   build -> EPIC-1
+#   deploy-dev -> T5.4
+#   e2e        -> T20.1
 #
-# `clean`, `dev-cluster`/`dev-cluster-down` (T1.3), `lint` (T1.4/T1.5), and
-# `test` (T1.6) are real.
+# `build`, `clean`, `dev-cluster`/`dev-cluster-down` (T1.3), `lint` (T1.4/T1.5),
+# and `test` (T1.6) are real.
 #
 # Tool versions are NOT pinned here: the toolchain comes from mise.toml, uv and
 # Python from analyzer/pyproject.toml and analyzer/.python-version (uv is
@@ -26,15 +27,11 @@ SHELL := /usr/bin/env bash
 # kind dev cluster (T1.3). Override on the command line, e.g.:
 #   make dev-cluster KIND_CLUSTER_NAME=kuvera-test KIND_NODE_IMAGE=kindest/node:v1.36.1
 #   make dev-cluster KIND_RECREATE=1     # delete and rebuild an existing cluster
-#   make dev-cluster KIND_EXPERIMENTAL_PROVIDER=podman   # docker | podman | nerdctl
 #
-# Docker and Podman are both supported. Left empty, kind auto-detects the
-# runtime it finds; set it explicitly when both are installed.
-# See docs/DEVELOPMENT-SETUP.md.
+# Docker is the only supported runtime. See docs/DEVELOPMENT-SETUP.md.
 KIND_CLUSTER_NAME ?= kuvera-dev
 KIND_NODE_IMAGE   ?=
-KIND_EXPERIMENTAL_PROVIDER ?=
-export KIND_CLUSTER_NAME KIND_NODE_IMAGE KIND_EXPERIMENTAL_PROVIDER
+export KIND_CLUSTER_NAME KIND_NODE_IMAGE
 
 # Go linter (T1.4). Override if golangci-lint lives outside $PATH, e.g.:
 #   make lint GOLANGCI_LINT=/usr/local/bin/golangci-lint
@@ -66,8 +63,13 @@ dev-cluster: ## Boot (or ensure) a local kind cluster with eBPF support (T1.3)
 dev-cluster-down: ## Tear down the local kind dev cluster (T1.3)
 	@scripts/dev-cluster.sh down
 
-build: ## Build all components (sensor, operator, api, analyzer, console)
-	@echo "make build: not yet implemented (tracked in EPIC-1)"
+# Go binaries land in bin/, the analyzer wheel and sdist in dist/analyzer/. The
+# console joins here with T17.1, which adds Vite and its build script.
+build: ## Build all components (sensor, operator, api, analyzer)
+	@cd sensor   && $(GO) build -o ../bin/ ./...
+	@cd operator && $(GO) build -o ../bin/ ./...
+	@cd api      && $(GO) build -o ../bin/ ./...
+	@cd analyzer && $(UV) build --quiet --out-dir ../dist/analyzer
 
 test: ## Run unit tests across all components (T1.6)
 	@cd sensor   && $(GO) test ./...
@@ -90,10 +92,10 @@ lint: ## Run all linters: Go (T1.4), Python and TypeScript (T1.5)
 # here once the first .ts/.tsx file lands.
 
 deploy-dev: ## Install the Helm chart into the dev cluster
-	@echo "make deploy-dev: not yet implemented (tracked in EPIC-1)"
+	@echo "make deploy-dev: not yet implemented (tracked in T5.4)"
 
 e2e: ## Run end-to-end tests against the dev cluster
-	@echo "make e2e: not yet implemented (tracked in EPIC-1)"
+	@echo "make e2e: not yet implemented (tracked in T20.1)"
 
 clean: ## Remove local build artifacts
 	@rm -rf bin dist build console/dist console/build e2e-output

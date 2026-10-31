@@ -10,8 +10,8 @@ on:
     branches: [main, dev]
 
 # No tool versions appear in this file. The toolchain (Go, Node, pnpm,
-# golangci-lint, kind, kubectl, helm, buf) comes from mise.toml. uv and Python
-# are managed outside mise: the uv version comes from `[tool.uv]
+# golangci-lint, kind, kubectl, helm, buf, pre-commit) comes from mise.toml. uv
+# and Python are managed outside mise: the uv version comes from `[tool.uv]
 # required-version` in analyzer/pyproject.toml, and uv installs the interpreter
 # named in analyzer/.python-version. Python packages come from
 # analyzer/uv.lock; console packages from console/pnpm-lock.yaml.
@@ -148,3 +148,6 @@ jobs:
 
       - name: Validate Makefile targets
         run: bash scripts/makefile_smoke_test.sh
+
+      - name: Validate pre-commit hooks
+        run: bash scripts/pre_commit_test.sh

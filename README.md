@@ -132,12 +132,12 @@ open http://localhost:8080
 
 Tool versions are managed with [mise](https://mise.jdx.dev) — `mise.toml` is the
 single source of truth for Go, Node.js, pnpm, golangci-lint, kind, kubectl, Helm,
-and buf. Python is the exception: install [uv](https://docs.astral.sh/uv/)
+buf, and pre-commit. Python is the exception: install [uv](https://docs.astral.sh/uv/)
 standalone, and uv installs and pins the interpreter itself
 (`analyzer/.python-version`).
 
 ```bash
-mise install                        # Go, Node, pnpm, golangci-lint, kind, kubectl, helm, buf
+mise install                        # Go, Node, pnpm, golangci-lint, kind, kubectl, helm, buf, pre-commit
 cd analyzer && uv sync              # Python interpreter + dev dependencies (via uv)
 cd console  && pnpm install         # console dependencies
 ```

@@ -174,7 +174,7 @@ clean-machine setup, including uv and the container runtime (Docker and Podman
 are both supported), neither of which mise manages. First-time setup:
 
 ```bash
-mise install                        # Go, Node, pnpm, golangci-lint, kind, kubectl, helm, buf
+mise install                        # Go, Node, pnpm, golangci-lint, kind, kubectl, helm, buf, pre-commit
 cd analyzer && uv sync              # uv installs Python and the dev dependency group
 cd console  && pnpm install
 ```

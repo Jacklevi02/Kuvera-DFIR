@@ -15,9 +15,9 @@ versioned binaries at all.
 | mise installs (from `mise.toml`) | uv installs / manages              | Your system must provide                   |
 | -------------------------------- | ---------------------------------- | ------------------------------------------ |
 | Go, Node.js, pnpm                | Python (from `analyzer/.python-version`) | A container runtime — Docker or Podman |
-| golangci-lint                    | ruff, mypy, pytest, structlog      | `git`, `make`, `bash`                      |
+| golangci-lint                    | ruff, mypy, pytest, structlog      | `git`, `make`, `bash`, `python3`           |
 | kind, kubectl, Helm              |                                    | A Linux kernel with BTF (for CO-RE eBPF)   |
-| buf                              |                                    | `sudo` access, to install the runtime once |
+| buf, pre-commit                  |                                    | `sudo` access, to install the runtime once |
 
 You never install Go, Node, or kubectl by hand, and you never pin their versions
 anywhere but `mise.toml`. Python and uv are deliberately **not** in `mise.toml`
@@ -198,7 +198,7 @@ mise install
 ```
 
 That reads `mise.toml` and installs Go, Node.js, pnpm, golangci-lint, kind,
-kubectl, Helm, and buf at the pinned versions. Confirm:
+kubectl, Helm, buf, and pre-commit at the pinned versions. Confirm:
 
 ```bash
 mise ls
@@ -223,6 +223,16 @@ Confirm the whole thing works:
 make lint
 make test
 ```
+
+Optionally, install the git hooks. They catch lint errors at commit time and
+refuse direct commits to `main` or `dev`:
+
+```bash
+pre-commit install
+```
+
+See [CONTRIBUTING.md](../CONTRIBUTING.md#pre-commit-hooks-optional) for what they
+check.
 
 ## 6. eBPF host requirements
 

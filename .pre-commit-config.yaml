@@ -1,0 +1,55 @@
+# Optional local git hooks. CI is what enforces lint; this only catches the same
+# problems before a push burns CI minutes. See CONTRIBUTING.md.
+#
+#   pre-commit install
+#
+# Every hook is `repo: local` on purpose. A remote hook repo needs a `rev:`, which
+# would be a second version pin for a tool that already has one, so these run the
+# tools from mise.toml, analyzer/pyproject.toml and console/package.json instead.
+# See docs/TOOLCHAIN.md.
+#
+# Each hook checks the same files with the same config as `make lint`, and none
+# of them rewrite files.
+default_install_hook_types: [pre-commit]
+default_stages: [pre-commit]
+
+repos:
+  - repo: local
+    hooks:
+      # Runs the formatters enabled in .golangci.yaml: gofmt and goimports.
+      - id: go-format
+        name: gofmt + goimports
+        language: system
+        entry: golangci-lint fmt --diff
+        files: ^(sensor|operator|api)/
+        types: [go]
+
+      - id: ruff
+        name: ruff
+        language: system
+        entry: uv run --quiet --project analyzer ruff check --force-exclude
+        files: ^analyzer/
+        types_or: [python, pyi]
+
+      # eslint.config.mjs and .prettierrc are relative to console/, so strip that
+      # prefix from the paths pre-commit passes in.
+      - id: eslint
+        name: eslint
+        language: system
+        entry: >-
+          bash -c 'cd console && exec pnpm exec eslint "${@#console/}"' --
+        files: ^console/src/.*\.tsx?$
+
+      - id: prettier
+        name: prettier
+        language: system
+        entry: >-
+          bash -c 'cd console && exec pnpm exec prettier --check --ignore-unknown "${@#console/}"' --
+        files: ^console/src/
+
+      - id: no-commit-to-protected-branch
+        name: no commits to main or dev
+        language: system
+        entry: scripts/no-commit-to-protected-branch.sh
+        always_run: true
+        pass_filenames: false

@@ -1,18 +1,25 @@
 // ESLint flat config (ESLint v10 format).
-// TypeScript-specific rules from @typescript-eslint become active once
-// node_modules is installed (pnpm install in console/). For the empty
-// scaffolding phase, the base JS rules are sufficient.
+
+import tsPlugin from "@typescript-eslint/eslint-plugin";
+import tsParser from "@typescript-eslint/parser";
 
 export default [
   {
     files: ["src/**/*.{ts,tsx}"],
     languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaFeatures: { jsx: true },
+      },
       ecmaVersion: 2022,
       sourceType: "module",
     },
+    plugins: {
+      "@typescript-eslint": tsPlugin,
+    },
     rules: {
       "no-console": "warn",
-      "no-unused-vars": "error",
+      "@typescript-eslint/no-unused-vars": "error",
       "prefer-const": "error",
     },
   },

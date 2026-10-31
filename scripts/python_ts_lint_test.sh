@@ -261,6 +261,24 @@ expect_lint_error "unused variable" probe.ts 'const unused: number = 1;\n' \
     "@typescript-eslint/no-unused-vars"
 
 # ---------------------------------------------------------------------------
+# 10. make lint reports misformatted Python
+# ---------------------------------------------------------------------------
+# ruff check passes this probe, so only ruff format --check can fail on it. Unlike
+# section 9 this needs the real uv, and the copy builds its own analyzer venv.
+echo "==> make lint reports misformatted Python"
+printf '"""Probe."""\n\nVALUE: dict[str,int] = {"a":1}\n' >"$work/analyzer/kuvera_analyzer/probe.py"
+if output="$(make -C "$work" lint GOLANGCI_LINT=true PNPM=true SHELLCHECK=true 2>&1)"; then
+    echo "  FAIL: make lint passed"
+    fail=1
+elif grep -q "would be reformatted" <<<"$output"; then
+    echo "  ok: ruff format reported the probe"
+else
+    echo "  FAIL: make lint failed, but not on ruff format:"
+    echo "$output"
+    fail=1
+fi
+
+# ---------------------------------------------------------------------------
 echo
 if [[ "$fail" -ne 0 ]]; then
     echo "Python and TypeScript lint config test FAILED"

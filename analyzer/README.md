@@ -42,11 +42,13 @@ uv sync   # installs the pinned Python and the dev dependency group
 ## Testing
 
 ```bash
-uv run pytest
+uv run pytest                           # exits 5 while tests/ is empty
 uv run ruff check .
 uv run ruff format --check .
-uv run mypy kuvera_analyzer
+uv run mypy --strict kuvera_analyzer/
 ```
+
+See [docs/TESTING.md](../docs/TESTING.md) for what `make test` and `make lint` run.
 
 ## References
 

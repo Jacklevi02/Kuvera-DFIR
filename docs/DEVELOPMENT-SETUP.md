@@ -172,8 +172,7 @@ refuse direct commits to `main` or `dev`:
 pre-commit install
 ```
 
-See [CONTRIBUTING.md](../CONTRIBUTING.md#pre-commit-hooks-optional) for what they
-check.
+See [TESTING.md](./TESTING.md#pre-commit-hooks) for what they check.
 
 ## 6. eBPF host requirements
 
@@ -217,7 +216,9 @@ make dev-cluster KIND_RECREATE=1            # delete and rebuild
 *on a node*, which CO-RE needs. It does not load an eBPF program, so a pass does
 not prove the sensor can load: rootless Docker would pass it and still fail (see
 [step 3](#3-install-docker)). CI's `Live cluster (kind + eBPF)` job covers that
-gap by loading a program in a node with `scripts/ebpf-probe.go`.
+gap by loading a program in a node with `scripts/ebpf-probe.go`, and
+[TESTING.md](./TESTING.md#what-only-runs-by-hand) shows how to run the same load
+by hand.
 
 ## Troubleshooting
 

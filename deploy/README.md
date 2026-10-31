@@ -14,7 +14,7 @@ deploy/
 
 ```bash
 make dev-cluster       # boots a kind cluster with eBPF support (idempotent)
-make deploy-dev        # installs the Helm chart to the dev cluster
+make deploy-dev        # stub until T5.4: prints "not yet implemented"
 make dev-cluster-down  # tears the kind cluster down
 ```
 
@@ -37,8 +37,8 @@ After the cluster is up, verify the eBPF prerequisites:
 scripts/dev-cluster-verify.sh   # nodes Ready + BTF present on a node
 ```
 
-`scripts/dev_cluster_config_test.sh` validates the kind config and scripts
-offline (no Docker/kind required), suitable for `make test` and CI.
+[docs/TESTING.md](../docs/TESTING.md) covers the offline config test and the full
+live cluster check, including loading an eBPF program.
 
 ## Helm chart
 

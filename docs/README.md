@@ -10,6 +10,8 @@ for the Kuvera DFIR platform.
   and how to add a new one
 - `DEVELOPMENT-SETUP.md` — clean-machine setup: mise, uv, Docker, first
   dev cluster, troubleshooting
+- `TESTING.md` — what each check covers, where it runs, what blocks a merge,
+  and what is by hand only
 
 ## Planned additions
 

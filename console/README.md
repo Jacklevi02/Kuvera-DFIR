@@ -45,11 +45,10 @@ pnpm run dev
 pnpm test
 pnpm run lint
 pnpm run format:check
-pnpm run typecheck
+pnpm run typecheck    # by hand only; fails with TS18003 while src/ is empty
 ```
 
-`pnpm run typecheck` fails with `TS18003` while `src/` is empty scaffolding, so it
-is not wired into `make lint` yet — add it there once the first `.tsx` file lands.
+See [docs/TESTING.md](../docs/TESTING.md) for what `make test` and `make lint` run.
 
 Node.js and pnpm versions come from `mise.toml`; everything else from
 `package.json`. See [docs/TOOLCHAIN.md](../docs/TOOLCHAIN.md).

@@ -86,7 +86,7 @@ clean machine, including Docker install and the eBPF host requirements.
 | **ESLint**        | console            | Lint (flat config)                                              |
 | **Prettier**      | console            | Format                                                          |
 | **buf**           | api, console       | Protobuf/gRPC codegen; the generated console API client         |
-| **pre-commit**    | all                | Optional local git hooks; see [CONTRIBUTING.md](../CONTRIBUTING.md#pre-commit-hooks-optional) |
+| **pre-commit**    | all                | Optional local git hooks; see [TESTING.md](./TESTING.md#pre-commit-hooks) |
 | **kind**          | deploy             | Local dev cluster with BTF and bpffs for eBPF                   |
 | **kubectl**       | deploy             | Cluster interaction                                             |
 | **Helm**          | deploy             | Chart packaging and install                                     |

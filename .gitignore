@@ -61,7 +61,7 @@ MANIFEST
 venv/
 env/
 ENV/
-.python-version
+# .python-version is NOT ignored: analyzer/.python-version is uv's interpreter pin.
 
 # uv
 .uv/

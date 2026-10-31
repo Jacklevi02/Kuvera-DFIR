@@ -125,10 +125,31 @@ open http://localhost:8080
 | [CLAUDE.md](./CLAUDE.md)                                   | Coding conventions, architecture rules, component layout, and what to push back on |
 | [docs/PROJECT-MANAGEMENT.md](./docs/PROJECT-MANAGEMENT.md) | Project board schema, label taxonomy, workflow conventions, and branch naming      |
 | [CONTRIBUTING.md](./CONTRIBUTING.md)                       | DCO sign-off requirement, pre-alpha status, branch naming                          |
+| [docs/TOOLCHAIN.md](./docs/TOOLCHAIN.md)                   | Which tools the project uses, where each version is pinned, how to add a tool       |
+| [docs/DEVELOPMENT-SETUP.md](./docs/DEVELOPMENT-SETUP.md)   | Clean-machine setup: mise, uv, Docker or Podman, first dev cluster, troubleshooting |
 
 ### Prerequisites
 
-Go 1.26+, Node 24+, Python 3.12+, Docker with `kind`.
+Tool versions are managed with [mise](https://mise.jdx.dev) — `mise.toml` is the
+single source of truth for Go, Node.js, pnpm, golangci-lint, kind, kubectl, Helm,
+and buf. Python is the exception: install [uv](https://docs.astral.sh/uv/)
+standalone, and uv installs and pins the interpreter itself
+(`analyzer/.python-version`).
+
+```bash
+mise install                        # Go, Node, pnpm, golangci-lint, kind, kubectl, helm, buf
+cd analyzer && uv sync              # Python interpreter + dev dependencies (via uv)
+cd console  && pnpm install         # console dependencies
+```
+
+You also need a container runtime — **Docker and Podman are both supported** —
+because `kind` runs each Kubernetes node as a container. Sensor development
+additionally needs a Linux kernel with BTF.
+
+Setting up from a clean machine, including runtime install steps for Fedora,
+Ubuntu, and macOS: [docs/DEVELOPMENT-SETUP.md](./docs/DEVELOPMENT-SETUP.md).
+What each tool is for and where every version is pinned:
+[docs/TOOLCHAIN.md](./docs/TOOLCHAIN.md).
 
 ### Common commands
 

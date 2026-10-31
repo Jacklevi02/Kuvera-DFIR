@@ -12,34 +12,44 @@
 #
 # `clean`, `dev-cluster`/`dev-cluster-down` (T1.3), `lint` (T1.4/T1.5), and
 # `test` (T1.6) are real.
+#
+# Tool versions are NOT pinned here: the toolchain comes from mise.toml, uv and
+# Python from analyzer/pyproject.toml and analyzer/.python-version (uv is
+# installed standalone, not by mise), and per-language tools from
+# analyzer/pyproject.toml and console/package.json.
+# pytest exit 5 means "no tests collected" — valid on an empty scaffolding.
 
 SHELL := /usr/bin/env bash
 
 .DEFAULT_GOAL := help
 
 # kind dev cluster (T1.3). Override on the command line, e.g.:
-#   make dev-cluster KIND_CLUSTER_NAME=kuvera-test KIND_NODE_IMAGE=kindest/node:v1.31.2
+#   make dev-cluster KIND_CLUSTER_NAME=kuvera-test KIND_NODE_IMAGE=kindest/node:v1.36.1
 #   make dev-cluster KIND_RECREATE=1     # delete and rebuild an existing cluster
+#   make dev-cluster KIND_EXPERIMENTAL_PROVIDER=podman   # docker | podman | nerdctl
+#
+# Docker and Podman are both supported. Left empty, kind auto-detects the
+# runtime it finds; set it explicitly when both are installed.
+# See docs/DEVELOPMENT-SETUP.md.
 KIND_CLUSTER_NAME ?= kuvera-dev
 KIND_NODE_IMAGE   ?=
-export KIND_CLUSTER_NAME KIND_NODE_IMAGE
+KIND_EXPERIMENTAL_PROVIDER ?=
+export KIND_CLUSTER_NAME KIND_NODE_IMAGE KIND_EXPERIMENTAL_PROVIDER
 
 # Go linter (T1.4). Override if golangci-lint lives outside $PATH, e.g.:
 #   make lint GOLANGCI_LINT=/usr/local/bin/golangci-lint
 GOLANGCI_LINT ?= golangci-lint
 
-# Python and TypeScript linters (T1.5). Override if tools live outside $PATH.
-RUFF     ?= ruff
-MYPY     ?= mypy
-ESLINT   ?= eslint
-PRETTIER ?= prettier
+# Python tooling runs through uv, so ruff/mypy/pytest versions come from
+# analyzer/pyproject.toml rather than whatever happens to be on $PATH.
+UV ?= uv
 
-# Test runners (T1.6). Override if tools live outside $PATH.
-# PYTEST exit 5 means "no tests collected" — valid on an empty scaffolding.
-GO     ?= go
-PYTEST ?= pytest
-# vitest is invoked via npx so any project-local install takes precedence.
-VITEST ?= npx --yes vitest
+# TypeScript tooling runs through pnpm, so eslint/prettier/typescript/vitest
+# versions come from console/package.json. pnpm only — no npm, no yarn.
+PNPM ?= pnpm
+
+# Go toolchain. Override if go lives outside $PATH.
+GO ?= go
 
 .PHONY: help dev-cluster dev-cluster-down build test lint deploy-dev e2e clean
 
@@ -63,18 +73,21 @@ test: ## Run unit tests across all components (T1.6)
 	@cd sensor   && $(GO) test ./...
 	@cd operator && $(GO) test ./...
 	@cd api      && $(GO) test ./...
-	@cd analyzer && ($(PYTEST) || [ $$? -eq 5 ])
-	@cd console  && $(VITEST) run --passWithNoTests
+	@cd analyzer && ($(UV) run pytest || [ $$? -eq 5 ])
+	@cd console  && $(PNPM) run test
 	@bash scripts/dev_cluster_config_test.sh
 
 lint: ## Run all linters: Go (T1.4), Python and TypeScript (T1.5)
 	@cd sensor   && $(GOLANGCI_LINT) run ./...
 	@cd operator && $(GOLANGCI_LINT) run ./...
 	@cd api      && $(GOLANGCI_LINT) run ./...
-	@cd analyzer && $(RUFF) check .
-	@cd analyzer && $(MYPY) --strict kuvera_analyzer/
-	@cd console  && $(ESLINT) --no-error-on-unmatched-pattern "src/**/*.{ts,tsx}"
-	@cd console  && $(PRETTIER) --check "src/**/*.{ts,tsx,css}" --no-error-on-unmatched-pattern
+	@cd analyzer && $(UV) run ruff check .
+	@cd analyzer && $(UV) run mypy --strict kuvera_analyzer/
+	@cd console  && $(PNPM) run lint
+	@cd console  && $(PNPM) run format:check
+# `pnpm run typecheck` is deliberately not wired in yet: tsc exits TS18003
+# ("no inputs were found") while console/src/ is empty scaffolding. Add it
+# here once the first .ts/.tsx file lands.
 
 deploy-dev: ## Install the Helm chart into the dev cluster
 	@echo "make deploy-dev: not yet implemented (tracked in EPIC-1)"

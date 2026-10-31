@@ -4,21 +4,19 @@
   "private": true,
   "description": "Kuvera forensics console SPA",
   "scripts": {
-    "lint": "eslint src",
-    "format:check": "prettier --check src",
+    "lint": "eslint src --no-error-on-unmatched-pattern",
+    "format:check": "prettier --check src --no-error-on-unmatched-pattern",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests"
   },
   "devDependencies": {
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "@typescript-eslint/eslint-plugin": "^8.0.0",
-    "@typescript-eslint/parser": "^8.0.0",
-    "eslint": "^10.1.0",
-    "prettier": "^3.0.0",
-    "typescript": "^6.0.0"
-  },
-  "engines": {
-    "node": ">=22"
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.2",
+    "@typescript-eslint/eslint-plugin": "^8.68.0",
+    "@typescript-eslint/parser": "^8.68.0",
+    "eslint": "^10.9.1",
+    "prettier": "^3.9.6",
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.11"
   }
 }

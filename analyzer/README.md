@@ -24,7 +24,11 @@ analyzer/
 
 ## Tooling
 
-- Python 3.12+, `uv` for dependency management (`pyproject.toml` is canonical).
+- `uv` manages both the interpreter and dependencies (`pyproject.toml` is
+  canonical, `uv.lock` is committed). uv is installed standalone, not by mise:
+  its version is pinned by `[tool.uv] required-version` in `pyproject.toml` and
+  the interpreter by `.python-version` — see
+  [docs/TOOLCHAIN.md](../docs/TOOLCHAIN.md).
 - `ruff` for lint + format, `mypy --strict` for typing. Type hints are
   mandatory; no `Any` without justification.
 - Logging via `structlog`.
@@ -32,7 +36,7 @@ analyzer/
 ## Setup
 
 ```bash
-uv sync --extra dev
+uv sync   # installs the pinned Python and the dev dependency group
 ```
 
 ## Testing

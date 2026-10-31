@@ -15,7 +15,7 @@ versioned binaries at all.
 | mise installs (from `mise.toml`) | uv installs / manages              | Your system must provide                   |
 | -------------------------------- | ---------------------------------- | ------------------------------------------ |
 | Go, Node.js, pnpm                | Python (from `analyzer/.python-version`) | Docker                                 |
-| golangci-lint                    | ruff, mypy, pytest, structlog      | `git`, `make`, `bash`                      |
+| golangci-lint, ShellCheck        | ruff, mypy, pytest, structlog      | `git`, `make`, `bash`                      |
 | kind, kubectl, Helm              |                                    | A Linux kernel with BTF (for CO-RE eBPF)   |
 | buf, pre-commit                  |                                    | `sudo` access, to install the runtime once |
 
@@ -138,8 +138,8 @@ From the repo root:
 mise install
 ```
 
-That reads `mise.toml` and installs Go, Node.js, pnpm, golangci-lint, kind,
-kubectl, Helm, buf, and pre-commit at the pinned versions. Confirm:
+That reads `mise.toml` and installs Go, Node.js, pnpm, golangci-lint, ShellCheck,
+kind, kubectl, Helm, buf, and pre-commit at the pinned versions. Confirm:
 
 ```bash
 mise ls
@@ -216,7 +216,8 @@ make dev-cluster KIND_RECREATE=1            # delete and rebuild
 `scripts/dev-cluster-verify.sh` confirms nodes are Ready and that BTF is present
 *on a node*, which CO-RE needs. It does not load an eBPF program, so a pass does
 not prove the sensor can load: rootless Docker would pass it and still fail (see
-[step 3](#3-install-docker)).
+[step 3](#3-install-docker)). CI's `Live cluster (kind + eBPF)` job covers that
+gap by loading a program in a node with `scripts/ebpf-probe.go`.
 
 ## Troubleshooting
 

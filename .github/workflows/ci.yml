@@ -10,10 +10,10 @@ on:
     branches: [main, dev]
 
 # No tool versions appear in this file. The toolchain (Go, Node, pnpm,
-# golangci-lint, kind, kubectl, helm, buf, pre-commit) comes from mise.toml. uv
-# and Python are managed outside mise: the uv version comes from `[tool.uv]
-# required-version` in analyzer/pyproject.toml, and uv installs the interpreter
-# named in analyzer/.python-version. Python packages come from
+# golangci-lint, shellcheck, kind, kubectl, helm, buf, pre-commit) comes from
+# mise.toml. uv and Python are managed outside mise: the uv version comes from
+# `[tool.uv] required-version` in analyzer/pyproject.toml, and uv installs the
+# interpreter named in analyzer/.python-version. Python packages come from
 # analyzer/uv.lock; console packages from console/pnpm-lock.yaml.
 # uv is set up before mise because mise installs pre-commit through uv.
 # See docs/TOOLCHAIN.md.
@@ -138,22 +138,46 @@ jobs:
         run: pnpm install --frozen-lockfile
         working-directory: console
 
-      - name: Validate golangci-lint config
-        run: bash scripts/golangci_lint_test.sh
-
-      - name: Validate Python/TS lint config
-        run: bash scripts/python_ts_lint_test.sh
-
-      - name: Validate make test wiring
-        run: bash scripts/make_test_smoke_test.sh
-
-      - name: Validate Makefile targets
-        run: bash scripts/makefile_smoke_test.sh
-
       # mise-action restores pre-commit from its cache, but not the uv-managed
       # Python it was built on.
       - name: Rebuild pre-commit
         run: mise install --force pypi:pre-commit
 
-      - name: Validate pre-commit hooks
-        run: bash scripts/pre_commit_test.sh
+      - name: make test-tooling
+        run: make test-tooling
+
+  cluster:
+    name: Live cluster (kind + eBPF)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version-file: analyzer/pyproject.toml
+          enable-cache: true
+          cache-dependency-glob: analyzer/uv.lock
+
+      - name: Set up toolchain
+        uses: jdx/mise-action@v5
+        with:
+          cache: true
+
+      - name: make dev-cluster
+        run: make dev-cluster
+
+      - name: Verify eBPF prerequisites
+        run: scripts/dev-cluster-verify.sh
+
+      # The second run is the negative control: without privilege the kernel must
+      # refuse the load, so a probe that always passes fails this step.
+      - name: Load an eBPF program in a kind node
+        run: |
+          CGO_ENABLED=0 go build -o "$RUNNER_TEMP/ebpf-probe" scripts/ebpf-probe.go
+          docker cp "$RUNNER_TEMP/ebpf-probe" kuvera-dev-control-plane:/ebpf-probe
+          docker exec kuvera-dev-control-plane /ebpf-probe
+          docker exec --user 65534 kuvera-dev-control-plane /ebpf-probe 2>&1 | grep -F 'operation not permitted'

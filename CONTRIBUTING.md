@@ -66,8 +66,8 @@ fail the DCO check and cannot be merged until the commits are amended.
 ## Toolchain
 
 Tool versions are managed with [mise](https://mise.jdx.dev). `mise.toml` is the
-single source of truth for Go, Node.js, pnpm, golangci-lint, kind, kubectl, Helm,
-buf, and pre-commit — do not pin those anywhere else.
+single source of truth for Go, Node.js, pnpm, golangci-lint, ShellCheck, kind,
+kubectl, Helm, buf, and pre-commit — do not pin those anywhere else.
 
 Python and uv are the exception and are **not** managed by mise. Install
 [uv](https://docs.astral.sh/uv/getting-started/installation/) standalone; uv then
@@ -76,7 +76,7 @@ installs and manages the Python interpreter. The uv version is pinned by
 `analyzer/.python-version`.
 
 ```bash
-mise install                        # Go, Node, pnpm, golangci-lint, kind, kubectl, helm, buf, pre-commit
+mise install                        # Go, Node, pnpm, golangci-lint, shellcheck, kind, kubectl, helm, buf, pre-commit
 cd analyzer && uv sync              # Python interpreter + dev dependencies (via uv)
 cd console  && pnpm install         # console dependencies
 ```
@@ -120,9 +120,9 @@ The hooks report problems and do not rewrite files. To fix them, run
 `golangci-lint fmt` from the repo root, `uv run ruff check --fix` in `analyzer/`,
 or `pnpm exec eslint --fix src` and `pnpm exec prettier --write src` in `console/`.
 
-This is a subset of `make lint`, which also runs golangci-lint's linters and mypy.
-Both need more than the staged files to give correct results, so they stay out
-of the hooks. `pre-commit run --all-files` checks the whole repo, not only staged
+This is a subset of `make lint`, which also runs golangci-lint's linters, mypy,
+and ShellCheck. The first two need more than the staged files to give correct
+results, so they stay out of the hooks. `pre-commit run --all-files` checks the whole repo, not only staged
 files. `pre-commit uninstall` removes the hook, and `git commit --no-verify`
 skips it for one commit.
 

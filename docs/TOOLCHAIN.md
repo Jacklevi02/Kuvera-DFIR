@@ -10,7 +10,7 @@ need to know what version of something the project uses, read the file in the
 
 | Layer                | Tools                                                                                                                   | Pinned in                            |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| Toolchain / runtimes | Go, Node.js, pnpm, golangci-lint, kind, kubectl, Helm, buf, pre-commit                                                  | `mise.toml`                          |
+| Toolchain / runtimes | Go, Node.js, pnpm, golangci-lint, ShellCheck, kind, kubectl, Helm, buf, pre-commit                                      | `mise.toml`                          |
 | uv                   | uv itself (installed standalone, **not** by mise)                                                                       | `[tool.uv] required-version` in `analyzer/pyproject.toml` |
 | Python interpreter   | CPython, installed and managed by uv                                                                                    | `analyzer/.python-version`           |
 | Go modules           | `cilium/ebpf`, controller-runtime, grpc-gateway                                                                           | `sensor/`, `operator/`, `api/go.mod` |
@@ -24,7 +24,7 @@ installs from them with `pnpm install --frozen-lockfile` / `uv sync --locked`. G
 ## Getting set up
 
 ```bash
-mise install                        # Go, Node, pnpm, golangci-lint, kind, kubectl, helm, buf, pre-commit
+mise install                        # Go, Node, pnpm, golangci-lint, shellcheck, kind, kubectl, helm, buf, pre-commit
 cd analyzer && uv sync              # Python interpreter + ruff, mypy, pytest, structlog
 cd console  && pnpm install         # TypeScript, ESLint, Prettier, Vitest
 ```
@@ -71,6 +71,7 @@ clean machine, including Docker install and the eBPF host requirements.
 | ----------------- | ------------------ | -------------------------------------------------------------- |
 | **Go**            | sensor, operator, api | All three services; the eBPF userspace loader                |
 | **golangci-lint** | sensor, operator, api | Lint (`errcheck`, `govet`, `staticcheck`, `gosec`, `revive`, `sloglint`) |
+| **ShellCheck**    | scripts            | Lint for the bash scripts, run by `make lint`                   |
 | **Python**        | analyzer           | Evidence analysis workers                                       |
 | **uv**            | analyzer           | Dependency resolution, virtualenv, task running                 |
 | **ruff**          | analyzer           | Lint + format                                                   |

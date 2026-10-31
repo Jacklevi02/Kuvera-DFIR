@@ -20,6 +20,9 @@ pnpm = "11"
 # Go linting. No Go manifest pins this, so mise does.
 golangci-lint = "2.14"
 
+# Bash linting for scripts/.
+shellcheck = "0.11"
+
 # Kubernetes dev cluster (make dev-cluster).
 kind    = "0.32"
 kubectl = "1.36"

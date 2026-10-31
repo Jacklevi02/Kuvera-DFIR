@@ -214,7 +214,7 @@ export MISE_TRUSTED_CONFIG_PATHS="$work"
 console_lint() {
     local status=0
     printf '%b' "$2" >"$work/console/src/$1"
-    make -C "$work" lint GOLANGCI_LINT=true UV=true 2>&1 || status=$?
+    make -C "$work" lint GOLANGCI_LINT=true UV=true SHELLCHECK=true 2>&1 || status=$?
     rm -f "$work/console/src/$1"
     return "$status"
 }

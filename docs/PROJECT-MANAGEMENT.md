@@ -4,6 +4,7 @@ This document describes how the Kuvera project is run on GitHub: the Project boa
 
 For the roadmap itself (sprint dates, goals, Gantt), see the [Kuvera GitHub Project](https://github.com/users/Jacklevi02/projects/4) Roadmap view and the [sprint milestones](https://github.com/Jacklevi02/Kuvera-DFIR/milestones).  
 For coding conventions, see `CLAUDE.md`.  
+For how testing works, see [TESTING.md](./TESTING.md).  
 For product spec, see `PROJECT.md`.
 
 ## Source of truth

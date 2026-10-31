@@ -180,11 +180,13 @@ cd console  && pnpm install
 
 - `make dev-cluster` — boots a `kind` cluster with the right kernel modules (BTF, eBPF).
 - `make build` — builds all components.
-- `make deploy-dev` — installs the Helm chart to the dev cluster.
+- `make deploy-dev` — stub until T5.4, then installs the Helm chart to the dev cluster.
 - `make test` — runs all unit tests.
 - `make test-tooling` — validates tooling config and make wiring (slow, re-runs `make lint` and `make test`).
-- `make e2e` — runs end-to-end tests against the dev cluster (slow, CI only).
+- `make e2e` — stub until T20.1, then runs end-to-end tests against the dev cluster.
 - `make lint` — runs all linters, including ShellCheck on `scripts/`.
+
+`docs/TESTING.md` covers what each check does, where it runs, and what blocks a merge.
 
 Pre-commit: lint must pass. Tests must pass. No commits to main directly — feature branches and PRs only.
 

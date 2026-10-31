@@ -91,6 +91,8 @@ never `pip install`. Both lockfiles (`console/pnpm-lock.yaml`,
 `analyzer/uv.lock`) are committed and CI installs from them.
 
 Before opening a PR, `make lint` and `make test` must both pass.
+[docs/TESTING.md](./docs/TESTING.md) covers what they check, where each check
+runs, and what blocks a merge.
 
 See [docs/TOOLCHAIN.md](./docs/TOOLCHAIN.md) for what each tool is for, where
 every version is pinned, and how to add a new tool to `mise.toml`.
@@ -100,31 +102,18 @@ every version is pinned, and how to add a new tool to `mise.toml`.
 ## Pre-commit hooks (optional)
 
 Git hooks catch problems locally, before CI burns minutes on them. They are a
-convenience and not required: CI runs the same checks either way.
+convenience and not required: CI runs the lint checks either way, and the branch
+ruleset blocks direct pushes to `main` and `dev`.
 
 ```bash
 pre-commit install                  # once per clone
 ```
 
-On each commit, the hooks check staged files only:
-
-| Hook                      | Checks                                  |
-| ------------------------- | --------------------------------------- |
-| gofmt + goimports         | Staged Go files, using `.golangci.yaml` |
-| ruff                      | Staged analyzer Python files            |
-| eslint                    | Staged console TypeScript files         |
-| prettier                  | Staged files in `console/src/`          |
-| no commits to main or dev | The current branch                      |
-
-The hooks report problems and do not rewrite files. To fix them, run
-`golangci-lint fmt` from the repo root, `uv run ruff check --fix` in `analyzer/`,
-or `pnpm exec eslint --fix src` and `pnpm exec prettier --write src` in `console/`.
-
-This is a subset of `make lint`, which also runs golangci-lint's linters, mypy,
-and ShellCheck. The first two need more than the staged files to give correct
-results, so they stay out of the hooks. `pre-commit run --all-files` checks the whole repo, not only staged
-files. `pre-commit uninstall` removes the hook, and `git commit --no-verify`
-skips it for one commit.
+`pre-commit uninstall` removes the hook, and `git commit --no-verify` skips it for
+one commit. [docs/TESTING.md](./docs/TESTING.md#pre-commit-hooks) covers what the
+hooks check and how to fix what they report. golangci-lint's linters and mypy stay
+out of the hooks because they need more than the staged files to give correct
+results.
 
 ---
 

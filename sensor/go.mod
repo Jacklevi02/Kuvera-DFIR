@@ -1,3 +1,3 @@
 module github.com/Jacklevi02/Kuvera-DFIR/sensor
 
-go 1.24
+go 1.27

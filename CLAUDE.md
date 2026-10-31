@@ -59,7 +59,8 @@ A self-managed, on-cluster forensics platform with these components:
 
 ### Go (sensor, operator, api)
 
-- Go 1.26+
+- Toolchain version is pinned in `mise.toml`; the `go` directive in each `go.mod`
+  and `run.go` in `.golangci.yaml` track it. See `docs/TOOLCHAIN.md`.
 - `gofmt`, `goimports`, `golangci-lint` (config in `.golangci.yaml`)
 - Errors: wrap with `fmt.Errorf("doing X: %w", err)`. No `pkg/errors`. No bare `err.Error()`.
 - Logging: `log/slog` only. Structured. Always include relevant K8s identifiers (namespace, pod, node).
@@ -70,8 +71,13 @@ A self-managed, on-cluster forensics platform with these components:
 
 ### Python (analyzer)
 
-- Python 3.12+
-- `uv` for dependency management. `pyproject.toml` is canonical.
+- Python and uv are **not** managed by mise. uv is installed standalone and
+  manages the interpreter: uv's version is pinned by `[tool.uv] required-version`
+  in `analyzer/pyproject.toml`, the interpreter by `analyzer/.python-version`.
+  The supported floor is `requires-python`, deliberately older than the pin.
+- `uv` for dependency management. `pyproject.toml` is canonical, `uv.lock` is
+  committed, dev tools live in `[dependency-groups] dev`, and CI runs
+  `uv sync --locked`. Never `pip install`.
 - `ruff` for lint+format, `mypy --strict` for typing.
 - Type hints are mandatory. No `Any` without justification.
 - Tests: `pytest`.
@@ -79,8 +85,11 @@ A self-managed, on-cluster forensics platform with these components:
 
 ### TypeScript (console)
 
-- TypeScript 6.0+, strict mode on, `noUncheckedIndexedAccess` enabled.
-- React 19+, functional components, hooks. No class components.
+- Versions pinned in `console/package.json`; Node.js and pnpm in `mise.toml`.
+- **pnpm only.** No npm, no yarn. `pnpm-lock.yaml` is committed and CI installs
+  with `--frozen-lockfile`.
+- TypeScript, strict mode on, `noUncheckedIndexedAccess` enabled.
+- React, functional components, hooks. No class components.
 - State: TanStack Query for server state. Zustand for client state if needed. No Redux.
 - Routing: TanStack Router.
 - Styling: Tailwind + shadcn/ui. No CSS modules. No styled-components.
@@ -155,6 +164,20 @@ spec:
 ```
 
 ## Development workflow
+
+Tool versions come from `mise.toml` (toolchain, except Python and uv),
+`analyzer/pyproject.toml` + `analyzer/.python-version` (uv, Python, and Python
+packages — uv is installed standalone, not by mise), and `console/package.json`
+(console packages). Never pin a version anywhere else — see `docs/TOOLCHAIN.md`
+for the rules and for how to add a new tool. `docs/DEVELOPMENT-SETUP.md` covers
+clean-machine setup, including uv and the container runtime (Docker and Podman
+are both supported), neither of which mise manages. First-time setup:
+
+```bash
+mise install                        # Go, Node, pnpm, golangci-lint, kind, kubectl, helm, buf
+cd analyzer && uv sync              # uv installs Python and the dev dependency group
+cd console  && pnpm install
+```
 
 - `make dev-cluster` — boots a `kind` cluster with the right kernel modules (BTF, eBPF).
 - `make build` — builds all components.

@@ -1,6 +1,6 @@
-// ESLint flat config (ESLint v9+ format).
+// ESLint flat config (ESLint v10 format).
 // TypeScript-specific rules from @typescript-eslint become active once
-// node_modules is installed (npm install in console/). For the empty
+// node_modules is installed (pnpm install in console/). For the empty
 // scaffolding phase, the base JS rules are sufficient.
 
 export default [

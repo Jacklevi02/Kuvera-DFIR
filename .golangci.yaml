@@ -17,7 +17,7 @@ version: "2"
 run:
   timeout: 5m
   # Pin to the Go version used across all modules in this repo.
-  go: "1.24"
+  go: "1.27"
 
 linters:
   # "standard" enables: errcheck, govet, staticcheck, ineffassign, unused.

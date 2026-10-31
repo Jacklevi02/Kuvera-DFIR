@@ -87,6 +87,67 @@ for tool in eslint prettier typescript; do
 done
 
 # ---------------------------------------------------------------------------
+# 6b. console/pnpm-lock.yaml is committed (pnpm only — no npm, no yarn)
+# ---------------------------------------------------------------------------
+echo "==> console/pnpm-lock.yaml is committed"
+if [[ -f "console/pnpm-lock.yaml" ]]; then
+    echo "  ok: console/pnpm-lock.yaml found"
+else
+    echo "  FAIL: console/pnpm-lock.yaml missing (run: cd console && pnpm install)"
+    fail=1
+fi
+
+echo "==> no npm/yarn lockfiles in console/"
+for stray in console/package-lock.json console/yarn.lock; do
+    if [[ -f "$stray" ]]; then
+        echo "  FAIL: $stray present — this project uses pnpm only"
+        fail=1
+    else
+        echo "  ok: $stray absent"
+    fi
+done
+
+# ---------------------------------------------------------------------------
+# 6c. analyzer/uv.lock is committed
+# ---------------------------------------------------------------------------
+echo "==> analyzer/uv.lock is committed"
+if [[ -f "analyzer/uv.lock" ]]; then
+    echo "  ok: analyzer/uv.lock found"
+else
+    echo "  FAIL: analyzer/uv.lock missing (run: cd analyzer && uv sync)"
+    fail=1
+fi
+
+# ---------------------------------------------------------------------------
+# 6d. Python and uv are pinned by uv, not mise (see docs/TOOLCHAIN.md)
+# ---------------------------------------------------------------------------
+echo "==> analyzer/.python-version pins the interpreter"
+if [[ -s "analyzer/.python-version" ]]; then
+    echo "  ok: analyzer/.python-version = $(head -1 analyzer/.python-version)"
+else
+    echo "  FAIL: analyzer/.python-version missing (run: cd analyzer && uv python pin <version>)"
+    fail=1
+fi
+
+echo "==> analyzer/pyproject.toml pins uv via [tool.uv] required-version"
+if python3 -c "import tomllib, sys; sys.exit(0 if tomllib.load(open('analyzer/pyproject.toml','rb')).get('tool', {}).get('uv', {}).get('required-version') else 1)" 2>/dev/null; then
+    echo "  ok: required-version set"
+else
+    echo "  FAIL: [tool.uv] required-version missing from analyzer/pyproject.toml"
+    fail=1
+fi
+
+echo "==> mise.toml does not manage python or uv"
+for tool in python uv; do
+    if grep -qE "^[[:space:]]*\"?$tool\"?[[:space:]]*=" mise.toml; then
+        echo "  FAIL: $tool is pinned in mise.toml — uv and Python are managed by uv"
+        fail=1
+    else
+        echo "  ok: $tool not in mise.toml"
+    fi
+done
+
+# ---------------------------------------------------------------------------
 # 7. console/tsconfig.json exists and has strict + noUncheckedIndexedAccess
 # ---------------------------------------------------------------------------
 echo "==> console/tsconfig.json exists"

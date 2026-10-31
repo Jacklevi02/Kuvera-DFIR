@@ -97,6 +97,7 @@ lint: ## Run all linters: Go (T1.4), Python and TypeScript (T1.5), Bash (T1.15)
 	@cd operator && $(GOLANGCI_LINT) run ./...
 	@cd api      && $(GOLANGCI_LINT) run ./...
 	@cd analyzer && $(UV) run ruff check .
+	@cd analyzer && $(UV) run ruff format --check .
 	@cd analyzer && $(UV) run mypy --strict kuvera_analyzer/
 	@cd console  && $(PNPM) run lint
 	@cd console  && $(PNPM) run format:check

@@ -103,7 +103,7 @@ The stack is fixed. Each choice is deliberate. Contributors should not introduce
 - Multi-tenant by namespace; RBAC-aware.
 - Runs on any conformant Kubernetes distribution (EKS, GKE, AKS, k3s, OpenShift).
 
-## MVP scope (first 3 months)
+## MVP scope (six 4-week sprints, 25 Oct 2026 – 10 Apr 2027)
 
 The MVP proves the core thesis: forensic evidence can be captured from a compromised pod in under 60 seconds with verifiable chain of custody.
 

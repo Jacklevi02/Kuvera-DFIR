@@ -15,7 +15,7 @@ versioned binaries at all.
 | mise installs (from `mise.toml`) | uv installs / manages              | Your system must provide                   |
 | -------------------------------- | ---------------------------------- | ------------------------------------------ |
 | Go, Node.js, pnpm                | Python (from `analyzer/.python-version`) | A container runtime — Docker or Podman |
-| golangci-lint                    | ruff, mypy, pytest, structlog      | `git`, `make`, `bash`, `python3`           |
+| golangci-lint                    | ruff, mypy, pytest, structlog      | `git`, `make`, `bash`                      |
 | kind, kubectl, Helm              |                                    | A Linux kernel with BTF (for CO-RE eBPF)   |
 | buf, pre-commit                  |                                    | `sudo` access, to install the runtime once |
 
@@ -284,6 +284,8 @@ actually needs. If it passes, your runtime choice works for this project.
 | `mise: command not found`                                       | mise not on `PATH`                                          | Re-run the install one-liner; open a new shell                          |
 | `go`/`pnpm`/`kubectl: command not found` after `mise install`   | mise not activated in your shell                            | Add the `mise activate` line to your rc file (step 1), open a new shell |
 | `uv: command not found`                                         | uv is not installed by mise                                 | Install it standalone (step 2)                                          |
+| `mise install` fails on `pypi:pre-commit` and mentions pipx     | mise installs pre-commit through uv, and uv is missing      | Install uv (step 2), then re-run `mise install`                         |
+| `pre-commit` reports a missing interpreter                      | The uv-managed Python its environment uses was removed      | `mise install --force pypi:pre-commit`                                  |
 | `Required uv version ... does not match the running version`    | Your uv is outside `[tool.uv] required-version`             | `uv self update`                                                        |
 | `VIRTUAL_ENV=... does not match the project environment path`   | Another virtualenv is activated in your shell               | `deactivate`; uv always uses `analyzer/.venv`                           |
 | `pnpm install` fails with a lockfile mismatch                   | `package.json` changed without the lockfile                 | `pnpm install` locally and commit `console/pnpm-lock.yaml`              |

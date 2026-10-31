@@ -45,11 +45,11 @@ else
     echo "  ok: no rev: keys"
 fi
 
-echo "==> mise.toml pins pre-commit"
-if grep -qE '^pre-commit[[:space:]]*=' mise.toml; then
+echo "==> mise.toml pins pre-commit on a uv-managed Python"
+if grep -qE '^"pypi:pre-commit"[[:space:]]*=.*only-managed' mise.toml; then
     echo "  ok: pre-commit pinned"
 else
-    echo "  FAIL: pre-commit not found in mise.toml"
+    echo "  FAIL: no pypi:pre-commit entry with only-managed in mise.toml"
     fail=1
 fi
 
@@ -78,6 +78,15 @@ if pre-commit install >/dev/null && [[ -x .git/hooks/pre-commit ]]; then
 else
     echo "  FAIL: pre-commit install did not create .git/hooks/pre-commit"
     exit 1
+fi
+
+echo "==> the hook runs on a uv-managed Python"
+hook_python="$(readlink -f "$(sed -n 's/^INSTALL_PYTHON=//p' .git/hooks/pre-commit)")"
+if [[ "$hook_python" == "$(readlink -f "$(uv python dir)")"/* ]]; then
+    echo "  ok: $hook_python"
+else
+    echo "  FAIL: hook does not use a uv-managed Python: $hook_python"
+    fail=1
 fi
 
 # ---------------------------------------------------------------------------
@@ -132,6 +141,7 @@ expect_allowed() {
 go_file=sensor/cmd/sensor/hook_probe.go
 py_file=analyzer/kuvera_analyzer/hook_probe.py
 ts_file=console/src/hook_probe.ts
+tsx_file=console/src/hook_probe.tsx
 
 echo "==> staged files with problems block the commit"
 expect_blocked "gofmt violation" "gofmt + goimports" "$go_file" \
@@ -145,7 +155,8 @@ expect_blocked "prettier violation" "prettier" "$ts_file" 'export const used = 1
 echo "==> clean staged files commit normally"
 expect_allowed "clean Go file" "$go_file" 'package main\n\nfunc probe() {}\n'
 expect_allowed "clean Python file" "$py_file" '"""Probe."""\n'
-expect_allowed "clean TypeScript file" "$ts_file" 'export const used = 1;\n'
+expect_allowed "clean TypeScript file" "$ts_file" 'export const used: number = 1;\n'
+expect_allowed "clean TSX file" "$tsx_file" 'export const element = <div />;\n'
 
 # ---------------------------------------------------------------------------
 # 5. The branch guard refuses main and dev

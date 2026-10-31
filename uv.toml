@@ -1,0 +1,4 @@
+# Repo-wide uv settings. Applies to every uv command under the repo root, except
+# in analyzer/, whose pyproject.toml has its own [tool.uv] that takes over.
+# See docs/TOOLCHAIN.md.
+python-preference = "only-managed"

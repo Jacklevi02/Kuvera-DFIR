@@ -45,6 +45,11 @@ clean machine, including Docker/Podman install and the eBPF host requirements.
   owns the interpreter (`uv python install` / `uv python pin`). Pinning either
   in mise would give the project two Python managers fighting over `PATH`.
   `scripts/python_ts_lint_test.sh` fails if either appears in `mise.toml`.
+- **pre-commit is a mise tool that runs on uv's Python.** It is repo-wide, so it
+  is pinned in `mise.toml` rather than in the analyzer. `pypi:pre-commit` makes
+  mise install it through uv into its own environment under mise's data
+  directory, and `--python-preference only-managed` keeps that environment off
+  system Python. uv must therefore be installed before `mise install`, in CI too.
 - **Bump versions in one place.** A toolchain bump is an edit to `mise.toml`
   and nothing else — CI reads the same file via `jdx/mise-action`, so there is
   no second copy to keep in sync. Likewise CI's `astral-sh/setup-uv` reads uv's
@@ -139,7 +144,7 @@ mise use ubi:BurntSushi/ripgrep[exe=rg]
 ```
 
 Prefer `aqua:` where available — it verifies checksums, and several of this
-project's tools (pnpm, golangci-lint, kind, kubectl, helm, buf, pre-commit) resolve through
+project's tools (pnpm, golangci-lint, kind, kubectl, helm, buf) resolve through
 it already.
 
 ### Adding a library instead
@@ -162,6 +167,17 @@ Commit the manifest **and** the lockfile together — CI installs with
   manages Python itself; see the pins in the table at the top. Upgrade uv with
   `uv self update` and bump `required-version`; change the interpreter with
   `cd analyzer && uv python pin <version>`.
+- **Nothing runs on system Python.** `analyzer/.python-version` pins an exact
+  version, and `python-preference = "only-managed"` makes uv ignore system
+  interpreters, so `analyzer/.venv` is built on a Python that uv installed under
+  `~/.local/share/uv/python`. A venv already keeps the project's packages off the
+  system. This protects in the other direction: an OS update cannot change or
+  remove the project's interpreter, and developers and CI run the same version.
+  The setting is in two places because uv does not merge config files: `uv.toml`
+  covers repo-root `uv run` calls, such as the ones in `scripts/`, and
+  `[tool.uv]` in `analyzer/pyproject.toml` covers the analyzer. Scripts call
+  `uv run python3`, never a bare `python3`, and fail if uv is missing.
+  `scripts/python_ts_lint_test.sh` fails if either setting is removed.
 
 Other dependencies cannot be a versioned binary in a project config. These are
 documented in [DEVELOPMENT-SETUP.md](./DEVELOPMENT-SETUP.md) instead.
@@ -174,9 +190,6 @@ documented in [DEVELOPMENT-SETUP.md](./DEVELOPMENT-SETUP.md) instead.
   plugin is just a binary. The daemon is not.
 - **`git`, `make`, `bash`.** `git` and `bash` are likewise absent from the mise
   registry. System tools, installed by your OS.
-- **`python3` for pre-commit.** The aqua build of pre-commit is a zipapp that needs
-  a system `python3` to start. That interpreter runs only pre-commit itself;
-  the analyzer still uses the one uv manages.
 - **The kernel.** BTF at `/sys/kernel/btf/vmlinux` is what makes CO-RE eBPF work,
   and cgroup v2 is what makes the dev cluster work. Nothing in userspace can
   install either.
@@ -211,7 +224,7 @@ uv and Python are upgraded outside mise:
 
 ```bash
 uv self update                         # then bump [tool.uv] required-version
-cd analyzer && uv python pin 3.15      # rewrites .python-version
+cd analyzer && uv python pin 3.15.1    # rewrites .python-version; always an exact version
 uv sync && make lint && make test
 ```
 

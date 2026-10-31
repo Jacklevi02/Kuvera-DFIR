@@ -12,9 +12,9 @@ dependencies = []
 [dependency-groups]
 # Installed by default with `uv sync`, so `uv run` never drops them.
 dev = [
-    "ruff>=0.16.4",
-    "mypy>=2.3",
-    "pytest>=9.1",
+    "ruff>=0.17.3",
+    "mypy>=2.4",
+    "pytest>=9.2",
     "structlog>=26.1",
 ]
 
@@ -22,6 +22,7 @@ dev = [
 # uv is installed standalone, not by mise. This is its only version pin;
 # astral-sh/setup-uv reads it in CI.
 required-version = ">=0.13,<0.14"
+python-preference = "only-managed"
 
 [tool.ruff]
 target-version = "py312"

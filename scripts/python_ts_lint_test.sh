@@ -16,6 +16,12 @@ cd "$repo_root"
 
 fail=0
 
+# The TOML and JSON checks below run on uv's interpreter.
+if ! command -v uv >/dev/null 2>&1; then
+    echo "FAIL: uv not found (see docs/DEVELOPMENT-SETUP.md)"
+    exit 1
+fi
+
 # ---------------------------------------------------------------------------
 # 1. analyzer/pyproject.toml exists
 # ---------------------------------------------------------------------------
@@ -31,7 +37,7 @@ fi
 # 2. analyzer/pyproject.toml is valid TOML
 # ---------------------------------------------------------------------------
 echo "==> analyzer/pyproject.toml is valid TOML"
-if python3 -c "import tomllib; tomllib.load(open('analyzer/pyproject.toml','rb'))" 2>/dev/null; then
+if uv run python3 -c "import tomllib; tomllib.load(open('analyzer/pyproject.toml','rb'))" 2>/dev/null; then
     echo "  ok: TOML parses cleanly"
 else
     echo "  FAIL: analyzer/pyproject.toml is not valid TOML"
@@ -66,7 +72,7 @@ fi
 # 5. console/package.json is valid JSON
 # ---------------------------------------------------------------------------
 echo "==> console/package.json is valid JSON"
-if python3 -c "import json; json.load(open('console/package.json'))" 2>/dev/null; then
+if uv run python3 -c "import json; json.load(open('console/package.json'))" 2>/dev/null; then
     echo "  ok: JSON parses cleanly"
 else
     echo "  FAIL: console/package.json is not valid JSON"
@@ -130,12 +136,22 @@ else
 fi
 
 echo "==> analyzer/pyproject.toml pins uv via [tool.uv] required-version"
-if python3 -c "import tomllib, sys; sys.exit(0 if tomllib.load(open('analyzer/pyproject.toml','rb')).get('tool', {}).get('uv', {}).get('required-version') else 1)" 2>/dev/null; then
+if uv run python3 -c "import tomllib, sys; sys.exit(0 if tomllib.load(open('analyzer/pyproject.toml','rb')).get('tool', {}).get('uv', {}).get('required-version') else 1)" 2>/dev/null; then
     echo "  ok: required-version set"
 else
     echo "  FAIL: [tool.uv] required-version missing from analyzer/pyproject.toml"
     fail=1
 fi
+
+echo "==> uv refuses system Python, in the repo root and the analyzer"
+for file in uv.toml analyzer/pyproject.toml; do
+    if grep -qE '^python-preference[[:space:]]*=[[:space:]]*"only-managed"' "$file"; then
+        echo "  ok: only-managed set in $file"
+    else
+        echo "  FAIL: python-preference = \"only-managed\" missing from $file"
+        fail=1
+    fi
+done
 
 echo "==> mise.toml does not manage python or uv"
 for tool in python uv; do
@@ -178,6 +194,71 @@ else
     echo "  FAIL: make lint exited non-zero — run 'make lint' to see the issues"
     fail=1
 fi
+
+# ---------------------------------------------------------------------------
+# 9. make lint parses TypeScript and still reports real errors (T1.14)
+# ---------------------------------------------------------------------------
+# The probes go in a throwaway copy, so a failed run leaves nothing in
+# console/src. The overrides reduce make lint to its console steps, because
+# section 8 already covers the rest.
+work="$(mktemp -d)"
+trap 'rm -rf "$work"' EXIT
+
+git ls-files -co --exclude-standard -z | tar --null -T - -cf - | tar -xf - -C "$work"
+ln -s "$repo_root/console/node_modules" "$work/console/node_modules"
+
+# The copy's mise.toml is new to mise, which refuses untrusted config files.
+export MISE_TRUSTED_CONFIG_PATHS="$work"
+
+# console_lint <file> <content>
+console_lint() {
+    local status=0
+    printf '%b' "$2" >"$work/console/src/$1"
+    make -C "$work" lint GOLANGCI_LINT=true UV=true 2>&1 || status=$?
+    rm -f "$work/console/src/$1"
+    return "$status"
+}
+
+# expect_lint_clean <description> <file> <content>
+expect_lint_clean() {
+    local output
+    if output="$(console_lint "$2" "$3")"; then
+        echo "  ok: $1"
+    else
+        echo "  FAIL: $1 — make lint failed:"
+        echo "$output"
+        fail=1
+    fi
+}
+
+# expect_lint_error <description> <file> <content> <rule>
+#
+# Matches on the rule name, because a parse error also fails make lint.
+expect_lint_error() {
+    local output
+    if output="$(console_lint "$2" "$3")"; then
+        echo "  FAIL: $1 — make lint passed"
+        fail=1
+    elif grep -q "$4" <<<"$output"; then
+        echo "  ok: $1"
+    else
+        echo "  FAIL: $1 — make lint failed, but not on $4:"
+        echo "$output"
+        fail=1
+    fi
+}
+
+echo "==> make lint accepts TypeScript and TSX"
+expect_lint_clean "type annotation" probe.ts 'export const typed: number = 1;\n'
+expect_lint_clean "JSX" probe.tsx 'export const element = <div />;\n'
+expect_lint_clean "component used only in JSX" probe.tsx \
+    'const Probe = () => <div />;\n\nexport const element = <Probe />;\n'
+expect_lint_clean "parameter name in a function type" probe.ts \
+    'export type Callback = (value: number) => void;\n'
+
+echo "==> make lint reports real errors in TypeScript"
+expect_lint_error "unused variable" probe.ts 'const unused: number = 1;\n' \
+    "@typescript-eslint/no-unused-vars"
 
 # ---------------------------------------------------------------------------
 echo

@@ -6,6 +6,9 @@
 #   1. `make help` lists every target.
 #   2. Every target runs and exits 0.
 #
+# It also checks that `make build` produces real artifacts and `make clean`
+# removes them.
+#
 # This is intentionally standalone (it shells out to `make` rather than living
 # inside a component test runner) so it can be wired into `make test` (T1.6)
 # and CI (T1.7) once those land. Run it from anywhere:
@@ -49,6 +52,33 @@ for t in "${runnable[@]}"; do
 		fail=1
 	fi
 done
+
+echo "==> 'make build' produces artifacts and 'make clean' removes them"
+make build >/dev/null 2>&1 || {
+	echo "  FAIL: make build exited non-zero"
+	fail=1
+}
+for bin in bin/sensor bin/operator bin/api; do
+	if [[ -x "$bin" ]]; then
+		echo "  ok: $bin built"
+	else
+		echo "  FAIL: $bin missing after make build"
+		fail=1
+	fi
+done
+if compgen -G 'dist/analyzer/*.whl' >/dev/null; then
+	echo "  ok: analyzer wheel built"
+else
+	echo "  FAIL: no analyzer wheel in dist/analyzer"
+	fail=1
+fi
+make clean >/dev/null 2>&1
+if [[ -e bin || -e dist ]]; then
+	echo "  FAIL: make clean left bin/ or dist/ behind"
+	fail=1
+else
+	echo "  ok: make clean removed artifacts"
+fi
 
 if [[ "$fail" -ne 0 ]]; then
 	echo "Makefile smoke test FAILED"

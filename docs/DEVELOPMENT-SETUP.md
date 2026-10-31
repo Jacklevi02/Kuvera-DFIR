@@ -14,7 +14,7 @@ versioned binaries at all.
 
 | mise installs (from `mise.toml`) | uv installs / manages              | Your system must provide                   |
 | -------------------------------- | ---------------------------------- | ------------------------------------------ |
-| Go, Node.js, pnpm                | Python (from `analyzer/.python-version`) | A container runtime — Docker or Podman |
+| Go, Node.js, pnpm                | Python (from `analyzer/.python-version`) | Docker                                 |
 | golangci-lint                    | ruff, mypy, pytest, structlog      | `git`, `make`, `bash`                      |
 | kind, kubectl, Helm              |                                    | A Linux kernel with BTF (for CO-RE eBPF)   |
 | buf, pre-commit                  |                                    | `sudo` access, to install the runtime once |
@@ -75,16 +75,10 @@ is outside it (`uv self update` fixes that). The interpreter version is in
 Other install methods (`brew install uv`, `pipx`, distro packages) are listed in
 [uv's installation docs](https://docs.astral.sh/uv/getting-started/installation/).
 
-## 3. Install a container runtime
+## 3. Install Docker
 
 `make dev-cluster` runs [kind](https://kind.sigs.k8s.io), which runs each
-Kubernetes node as a container. kind auto-detects Docker, Podman, or nerdctl.
-
-**Docker and Podman are both supported.** Pick one. If you are on Fedora you
-already have Podman; if you have no preference, Docker is the path with the
-fewest moving parts for privileged workloads.
-
-### Option A — Docker Engine
+Kubernetes node as a container. Docker is the only supported runtime.
 
 **Fedora**
 
@@ -130,64 +124,11 @@ docker run hello-world
 
 > The `docker` group grants root-equivalent privileges to its members. That is a
 > deliberate trade-off documented by Docker itself; on a shared or production
-> machine, prefer `sudo docker` or rootless mode.
+> machine, prefer `sudo docker`.
 
-### Option B — Podman
-
-**Fedora** — Podman ships with the workstation image. If it is missing:
-
-```bash
-sudo dnf install podman
-```
-
-**Ubuntu / Debian**
-
-```bash
-sudo apt update && sudo apt install podman
-```
-
-**macOS**
-
-```bash
-brew install podman
-podman machine init
-podman machine start
-```
-
-Tell kind to use it (kind auto-detects, but being explicit avoids surprises when
-both runtimes are installed):
-
-```bash
-export KIND_EXPERIMENTAL_PROVIDER=podman
-```
-
-or per-invocation:
-
-```bash
-make dev-cluster KIND_EXPERIMENTAL_PROVIDER=podman
-```
-
-**Rootless vs rootful.** Podman defaults to rootless. Kuvera's dev cluster
-bind-mounts `/sys/fs/bpf` and `/sys/kernel/debug` into every node (see
-`deploy/dev/kind-config.yaml`) so the sensor's eBPF programs behave as they would
-on a real node. If rootless Podman cannot provide those mounts on your kernel,
-run kind under rootful Podman (`sudo -E` with `KIND_EXPERIMENTAL_PROVIDER=podman`).
-Verify either way with `scripts/dev-cluster-verify.sh` — see
-[step 7](#7-first-dev-cluster).
-
-Rootless Podman additionally requires cgroup v2 with the `cpu` controller
-delegated (default on Fedora 31+, Ubuntu 21.10+):
-
-```bash
-stat -fc %T /sys/fs/cgroup                                                    # expect: cgroup2fs
-cat /sys/fs/cgroup/user.slice/user-$(id -u).slice/user@$(id -u).service/cgroup.controllers
-                                                                              # expect cpu in the list
-```
-
-kind watches `podman logs` to detect node startup. Under rootless Podman the
-default userspace log relay can connect too late and kind times out; configuring
-Podman's `k8s-file` log driver avoids it. See
-[kind's rootless notes](https://kind.sigs.k8s.io/docs/user/rootless/).
+Use Docker's normal mode, not rootless mode. Rootless nodes run in a user
+namespace, and the kernel requires `CAP_BPF` in the initial user namespace, so
+eBPF programs cannot load there even though the node looks fully privileged.
 
 ## 4. Install the toolchain
 
@@ -249,7 +190,7 @@ ls -l /sys/kernel/btf/vmlinux   # must exist — this is what makes CO-RE work
 automatically.
 
 > **macOS caveat.** On macOS, kind runs inside a Linux VM (Docker Desktop's
-> LinuxKit VM, Colima's, or `podman machine`'s). Whether that VM's kernel exposes
+> LinuxKit VM or Colima's). Whether that VM's kernel exposes
 > BTF at `/sys/kernel/btf/vmlinux` depends on the VM image and is not something
 > this project has verified. `scripts/dev-cluster-verify.sh` is the check — run
 > it before assuming sensor work will function on macOS. A Linux host or VM is
@@ -269,13 +210,13 @@ re-checks node readiness. Useful overrides:
 ```bash
 make dev-cluster KIND_CLUSTER_NAME=kuvera-test
 make dev-cluster KIND_NODE_IMAGE=kindest/node:v1.36.1
-make dev-cluster KIND_EXPERIMENTAL_PROVIDER=podman
 make dev-cluster KIND_RECREATE=1            # delete and rebuild
 ```
 
-`scripts/dev-cluster-verify.sh` is the acceptance test for your setup: it confirms
-nodes are Ready and that BTF is present *on a node*, which is what the sensor
-actually needs. If it passes, your runtime choice works for this project.
+`scripts/dev-cluster-verify.sh` confirms nodes are Ready and that BTF is present
+*on a node*, which CO-RE needs. It does not load an eBPF program, so a pass does
+not prove the sensor can load: rootless Docker would pass it and still fail (see
+[step 3](#3-install-docker)).
 
 ## Troubleshooting
 
@@ -290,9 +231,8 @@ actually needs. If it passes, your runtime choice works for this project.
 | `VIRTUAL_ENV=... does not match the project environment path`   | Another virtualenv is activated in your shell               | `deactivate`; uv always uses `analyzer/.venv`                           |
 | `pnpm install` fails with a lockfile mismatch                   | `package.json` changed without the lockfile                 | `pnpm install` locally and commit `console/pnpm-lock.yaml`              |
 | `permission denied` on `/var/run/docker.sock`                   | Your user is not in the `docker` group                      | `sudo usermod -aG docker $USER && newgrp docker`                        |
-| `make dev-cluster` hangs, then times out (Podman)               | rootless Podman log relay connects after kind stops waiting | Use the `k8s-file` log driver, or run rootful                           |
 | `dev-cluster-verify.sh` reports no BTF                          | Kernel built without BTF, or a VM whose kernel lacks it     | Use a Linux host/VM with `CONFIG_DEBUG_INFO_BTF=y`                      |
-| kind picks the wrong runtime with both installed                | Auto-detection                                              | Set `KIND_EXPERIMENTAL_PROVIDER=docker` or `=podman` explicitly         |
+| Loading eBPF fails with `operation not permitted` in a kind node | Rootless Docker: no `CAP_BPF` in the initial user namespace | Run Docker in its normal mode                                           |
 
 ## Adding tools later
 

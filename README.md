@@ -126,7 +126,8 @@ open http://localhost:8080
 | [docs/PROJECT-MANAGEMENT.md](./docs/PROJECT-MANAGEMENT.md) | Project board schema, label taxonomy, workflow conventions, and branch naming      |
 | [CONTRIBUTING.md](./CONTRIBUTING.md)                       | DCO sign-off requirement, pre-alpha status, branch naming                          |
 | [docs/TOOLCHAIN.md](./docs/TOOLCHAIN.md)                   | Which tools the project uses, where each version is pinned, how to add a tool       |
-| [docs/DEVELOPMENT-SETUP.md](./docs/DEVELOPMENT-SETUP.md)   | Clean-machine setup: mise, uv, Docker or Podman, first dev cluster, troubleshooting |
+| [docs/DEVELOPMENT-SETUP.md](./docs/DEVELOPMENT-SETUP.md)   | Clean-machine setup: mise, uv, Docker, first dev cluster, troubleshooting           |
+| [Project roadmap](https://github.com/users/Jacklevi02/projects/4) | Sprint dates, goals, and Gantt: the GitHub Project's Roadmap view            |
 
 ### Prerequisites
 
@@ -142,11 +143,10 @@ cd analyzer && uv sync              # Python interpreter + dev dependencies (via
 cd console  && pnpm install         # console dependencies
 ```
 
-You also need a container runtime — **Docker and Podman are both supported** —
-because `kind` runs each Kubernetes node as a container. Sensor development
-additionally needs a Linux kernel with BTF.
+You also need **Docker**, because `kind` runs each Kubernetes node as a container.
+Sensor development additionally needs a Linux kernel with BTF.
 
-Setting up from a clean machine, including runtime install steps for Fedora,
+Setting up from a clean machine, including Docker install steps for Fedora,
 Ubuntu, and macOS: [docs/DEVELOPMENT-SETUP.md](./docs/DEVELOPMENT-SETUP.md).
 What each tool is for and where every version is pinned:
 [docs/TOOLCHAIN.md](./docs/TOOLCHAIN.md).
@@ -170,7 +170,7 @@ api/        Go — gRPC + REST API gateway
 analyzer/   Python — evidence analysis workers (Volatility3, YARA)
 console/    TypeScript + React + Vite — investigator SPA
 deploy/     Helm charts and Kubernetes manifests
-docs/       Architecture docs, ADRs, roadmap
+docs/       Architecture docs, ADRs
 ```
 
 ## Licensing

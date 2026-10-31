@@ -18,12 +18,9 @@
 #   KIND_RECREATE       non-empty => rebuild on `up` (default: unset)
 #   KIND               kind binary                   (default: kind)
 #   KUBECTL            kubectl binary                (default: kubectl)
-#   KIND_EXPERIMENTAL_PROVIDER
-#                       container runtime kind uses: docker | podman | nerdctl
-#                       (default: unset => kind auto-detects)
 #
-# Docker and Podman are both supported. See docs/DEVELOPMENT-SETUP.md for
-# runtime install steps and the eBPF host requirements.
+# Docker is the only supported runtime. See docs/DEVELOPMENT-SETUP.md for
+# install steps and the eBPF host requirements.
 set -euo pipefail
 
 KIND="${KIND:-kind}"
@@ -32,8 +29,8 @@ KIND_CLUSTER_NAME="${KIND_CLUSTER_NAME:-kuvera-dev}"
 KIND_CONFIG="${KIND_CONFIG:-deploy/dev/kind-config.yaml}"
 KIND_NODE_IMAGE="${KIND_NODE_IMAGE:-}"
 KIND_RECREATE="${KIND_RECREATE:-}"
-KIND_EXPERIMENTAL_PROVIDER="${KIND_EXPERIMENTAL_PROVIDER:-}"
-export KIND_EXPERIMENTAL_PROVIDER
+# Fixed, so kind never falls back to another runtime it finds on the machine.
+export KIND_EXPERIMENTAL_PROVIDER=docker
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
@@ -59,45 +56,10 @@ wait_ready() {
 		wait --for=condition=Ready nodes --all --timeout=120s
 }
 
-# kind needs a container runtime to host the nodes. Check for one up front so a
-# missing runtime produces an actionable message instead of a provider error
-# from deep inside kind.
-require_runtime() {
-	local wanted="$KIND_EXPERIMENTAL_PROVIDER"
-	if [[ -n "$wanted" ]]; then
-		if ! command -v "$wanted" >/dev/null 2>&1; then
-			err "KIND_EXPERIMENTAL_PROVIDER='${wanted}' but '${wanted}' is not on PATH"
-			err "see docs/DEVELOPMENT-SETUP.md to install a container runtime"
-			exit 1
-		fi
-		log "using container runtime '${wanted}'"
-		return 0
-	fi
-
-	local found=()
-	local candidate
-	for candidate in docker podman nerdctl; do
-		if command -v "$candidate" >/dev/null 2>&1; then
-			found+=("$candidate")
-		fi
-	done
-
-	if [[ "${#found[@]}" -eq 0 ]]; then
-		err "no container runtime found (looked for docker, podman, nerdctl)"
-		err "see docs/DEVELOPMENT-SETUP.md to install one"
-		exit 1
-	fi
-
-	if [[ "${#found[@]}" -gt 1 ]]; then
-		log "multiple container runtimes available (${found[*]}); letting kind auto-detect"
-		log "set KIND_EXPERIMENTAL_PROVIDER to choose explicitly"
-	fi
-}
-
 up() {
 	require "$KIND"
 	require "$KUBECTL"
-	require_runtime
+	require docker
 	if [[ ! -f "$KIND_CONFIG" ]]; then
 		err "kind config not found at ${KIND_CONFIG}"
 		exit 1

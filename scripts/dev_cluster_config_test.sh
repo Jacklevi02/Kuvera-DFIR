@@ -11,6 +11,9 @@
 #   2. deploy/dev/kind-config.yaml is a valid v1alpha4 kind Cluster that
 #      bind-mounts bpffs and debugfs into every node.
 #   3. The Makefile exposes dev-cluster and dev-cluster-down.
+#   4. scripts/dev-cluster.sh pins kind to Docker.
+#   5. scripts/dev-cluster-verify.sh fails when the BTF check inside the debug
+#      pod fails, using a stub kubectl.
 #
 set -euo pipefail
 
@@ -101,6 +104,76 @@ for t in dev-cluster dev-cluster-down; do
 		fail=1
 	fi
 done
+
+echo "==> dev-cluster.sh pins kind to Docker"
+if grep -qx 'export KIND_EXPERIMENTAL_PROVIDER=docker' scripts/dev-cluster.sh; then
+	echo "  ok: provider fixed to docker"
+else
+	echo "  FAIL: scripts/dev-cluster.sh does not pin KIND_EXPERIMENTAL_PROVIDER=docker"
+	fail=1
+fi
+
+echo "==> dev-cluster-verify.sh reports the debug pod's result"
+stub_dir="$(mktemp -d)"
+trap 'rm -rf "$stub_dir"' EXIT
+cat >"$stub_dir/kubectl" <<'STUB'
+#!/usr/bin/env bash
+# Stands in for kubectl: args are `--context <ctx> <subcommand> ...`.
+case "$3" in
+get)
+	if [[ "$4" == "nodes" ]]; then
+		echo stub-node
+	elif [[ "$7" == *waiting.reason* ]]; then
+		echo "$STUB_REASON"
+	elif [[ -n "$STUB_FLAKY" && ! -e "$STUB_FLAKY" ]]; then
+		touch "$STUB_FLAKY" # fail the first phase check only
+		exit 1
+	else
+		echo "$STUB_PHASE"
+	fi
+	;;
+debug)
+	echo "Creating debugging pod node-debugger-stub-node-abc12 with container debugger on node stub-node."
+	;;
+delete)
+	touch "$STUB_DELETED"
+	;;
+esac
+STUB
+chmod +x "$stub_dir/kubectl"
+
+# expect_verify <description> <phase> <expected exit: 0 or 1> <expected output> [reason] [flaky]
+expect_verify() {
+	local status=0 output flaky="" timeout=1
+	if [[ -n "${6:-}" ]]; then
+		flaky="$stub_dir/flaky"
+		timeout=2
+	fi
+	rm -f "$stub_dir/deleted" "$stub_dir/flaky"
+	output="$(KUBECTL="$stub_dir/kubectl" STUB_PHASE="$2" STUB_REASON="${5:-}" STUB_FLAKY="$flaky" \
+		STUB_DELETED="$stub_dir/deleted" DEBUG_TIMEOUT="$timeout" \
+		bash scripts/dev-cluster-verify.sh 2>&1)" || status=$?
+	if [[ "$status" -ne "$3" ]]; then
+		echo "  FAIL: $1: exited $status, expected $3"
+		fail=1
+	elif ! grep -qF -- "$4" <<<"$output"; then
+		echo "  FAIL: $1: output missing '$4'"
+		fail=1
+	elif [[ ! -e "$stub_dir/deleted" ]]; then
+		echo "  FAIL: $1: debug pod not deleted"
+		fail=1
+	else
+		echo "  ok: $1"
+	fi
+}
+
+expect_verify "file present passes" Succeeded 0 "satisfies the eBPF prerequisites"
+expect_verify "file missing fails" Failed 1 "BTF check failed"
+expect_verify "pod never finishing fails" Running 1 "did not finish within 1s"
+expect_verify "image pull failure reports the reason" Pending 1 \
+	"did not finish within 1s (phase: Pending, reason: ImagePullBackOff)" ImagePullBackOff
+expect_verify "one failed status call is retried" Succeeded 0 \
+	"satisfies the eBPF prerequisites" "" flaky
 
 if [[ "$fail" -ne 0 ]]; then
 	echo "dev-cluster config test FAILED"

@@ -151,7 +151,7 @@ A ticket can move to `Done` when:
 3. `make lint` passes.
 4. `make test` passes.
 5. Code reviewed (self-review acceptable while solo; required PR review once team grows).
-6. Merged to `main` via PR (no direct commits to `main`).
+6. Merged to `dev` via PR (no direct commits to `dev` or `main`).
 7. If `chain-of-custody` labelled: change explicitly called out in the PR description and reviewed against `CLAUDE.md` rule 4.
 
 ### Sprint level
@@ -159,7 +159,7 @@ A ticket can move to `Done` when:
 A sprint is closed when:
 
 1. All tickets in the sprint are either `Done` or explicitly moved to a later sprint with a written reason.
-2. `make lint` and `make test` pass on `main`.
+2. `make lint` and `make test` pass on `dev`.
 3. `docs/sprint-demos/sprint-N.md` is written, containing:
    - **What was built** — short prose summary.
    - **What works end-to-end** — bullet list of demoable flows, or "infrastructure-only sprint, no user-visible output" if applicable.
@@ -170,7 +170,7 @@ A sprint is closed when:
 
 ## Workflow conventions
 
-1. No commits to `main` directly. Feature branches and PRs only.
+1. No commits to `main` or `dev` directly. Feature branches and PRs only.
 2. Branch naming: `<issue-number>-<ticket-id>-<component>-<slug>` — e.g. `4-t11-infra-scaffold-monorepo-directory-structure`, `10-t17-infra-github-actions-ci-lint-test-on-every-pr`. This mirrors the GitHub default branch name created from an issue and keeps branches sortable by issue number.
 3. PR descriptions reference the issue: `Closes #42`.
 4. Chain-of-custody-touching PRs must state so explicitly in the description.

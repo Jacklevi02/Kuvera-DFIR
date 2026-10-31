@@ -27,3 +27,7 @@ helm    = "4.2"
 
 # protobuf/gRPC codegen for api/proto and the generated console client.
 buf = "1.72"
+
+# Optional git hooks (.pre-commit-config.yaml). Resolves through aqua, so CI can
+# install it before uv is set up. It is a zipapp that runs on the system python3.
+pre-commit = "4.7"

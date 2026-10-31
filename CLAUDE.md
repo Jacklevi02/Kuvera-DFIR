@@ -173,7 +173,7 @@ for the rules and for how to add a new tool. `docs/DEVELOPMENT-SETUP.md` covers
 clean-machine setup, including uv and Docker, neither of which mise manages. First-time setup:
 
 ```bash
-mise install                        # Go, Node, pnpm, golangci-lint, kind, kubectl, helm, buf, pre-commit
+mise install                        # Go, Node, pnpm, golangci-lint, shellcheck, kind, kubectl, helm, buf, pre-commit
 cd analyzer && uv sync              # uv installs Python and the dev dependency group
 cd console  && pnpm install
 ```
@@ -182,8 +182,9 @@ cd console  && pnpm install
 - `make build` — builds all components.
 - `make deploy-dev` — installs the Helm chart to the dev cluster.
 - `make test` — runs all unit tests.
+- `make test-tooling` — validates tooling config and make wiring (slow, re-runs `make lint` and `make test`).
 - `make e2e` — runs end-to-end tests against the dev cluster (slow, CI only).
-- `make lint` — runs all linters.
+- `make lint` — runs all linters, including ShellCheck on `scripts/`.
 
 Pre-commit: lint must pass. Tests must pass. No commits to main directly — feature branches and PRs only.
 

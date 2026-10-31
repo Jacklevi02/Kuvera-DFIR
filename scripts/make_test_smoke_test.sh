@@ -103,6 +103,7 @@ else
 fi
 # Python and TypeScript runners are invoked through uv and pnpm so their
 # versions come from analyzer/pyproject.toml and console/package.json.
+# shellcheck disable=SC2016 # Literal Make variables, grepped from the Makefile.
 for runner in '$(UV) run pytest' '$(PNPM) run test'; do
     if grep -qF "$runner" Makefile; then
         echo "  ok: $runner referenced in Makefile"

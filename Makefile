@@ -12,7 +12,7 @@
 #   e2e        -> T20.1
 #
 # `build`, `clean`, `dev-cluster`/`dev-cluster-down` (T1.3), `lint` (T1.4/T1.5),
-# and `test` (T1.6) are real.
+# `test` (T1.6), and `test-tooling` (T1.15) are real.
 #
 # Tool versions are NOT pinned here: the toolchain comes from mise.toml, uv and
 # Python from analyzer/pyproject.toml and analyzer/.python-version (uv is
@@ -37,6 +37,9 @@ export KIND_CLUSTER_NAME KIND_NODE_IMAGE
 #   make lint GOLANGCI_LINT=/usr/local/bin/golangci-lint
 GOLANGCI_LINT ?= golangci-lint
 
+# Bash linter (T1.15). Override if shellcheck lives outside $PATH.
+SHELLCHECK ?= shellcheck
+
 # Python tooling runs through uv, so ruff/mypy/pytest versions come from
 # analyzer/pyproject.toml rather than whatever happens to be on $PATH.
 UV ?= uv
@@ -48,7 +51,7 @@ PNPM ?= pnpm
 # Go toolchain. Override if go lives outside $PATH.
 GO ?= go
 
-.PHONY: help dev-cluster dev-cluster-down build test lint deploy-dev e2e clean
+.PHONY: help dev-cluster dev-cluster-down build test test-tooling lint deploy-dev e2e clean
 
 help: ## List all available targets
 	@echo "Kuvera — make targets:"
@@ -79,7 +82,17 @@ test: ## Run unit tests across all components (T1.6)
 	@cd console  && $(PNPM) run test
 	@bash scripts/dev_cluster_config_test.sh
 
-lint: ## Run all linters: Go (T1.4), Python and TypeScript (T1.5)
+# These re-run make lint and make test, so this is the slowest target. CI's
+# Validate job runs it. makefile_smoke_test.sh must never run this target, or
+# the two would recurse.
+test-tooling: ## Validate tooling config and make wiring (T1.15)
+	@bash scripts/golangci_lint_test.sh
+	@bash scripts/python_ts_lint_test.sh
+	@bash scripts/make_test_smoke_test.sh
+	@bash scripts/makefile_smoke_test.sh
+	@bash scripts/pre_commit_test.sh
+
+lint: ## Run all linters: Go (T1.4), Python and TypeScript (T1.5), Bash (T1.15)
 	@cd sensor   && $(GOLANGCI_LINT) run ./...
 	@cd operator && $(GOLANGCI_LINT) run ./...
 	@cd api      && $(GOLANGCI_LINT) run ./...
@@ -87,6 +100,7 @@ lint: ## Run all linters: Go (T1.4), Python and TypeScript (T1.5)
 	@cd analyzer && $(UV) run mypy --strict kuvera_analyzer/
 	@cd console  && $(PNPM) run lint
 	@cd console  && $(PNPM) run format:check
+	@$(SHELLCHECK) scripts/*.sh
 # `pnpm run typecheck` is deliberately not wired in yet: tsc exits TS18003
 # ("no inputs were found") while console/src/ is empty scaffolding. Add it
 # here once the first .ts/.tsx file lands.

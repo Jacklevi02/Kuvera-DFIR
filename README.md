@@ -127,6 +127,7 @@ open http://localhost:8080
 | [CONTRIBUTING.md](./CONTRIBUTING.md)                       | DCO sign-off requirement, pre-alpha status, branch naming                          |
 | [docs/TOOLCHAIN.md](./docs/TOOLCHAIN.md)                   | Which tools the project uses, where each version is pinned, how to add a tool       |
 | [docs/DEVELOPMENT-SETUP.md](./docs/DEVELOPMENT-SETUP.md)   | Clean-machine setup: mise, uv, Docker, first dev cluster, troubleshooting           |
+| [docs/TESTING.md](./docs/TESTING.md)                       | What each check covers, where it runs, what blocks a merge, what is by hand only    |
 | [Project roadmap](https://github.com/users/Jacklevi02/projects/4) | Sprint dates, goals, and Gantt: the GitHub Project's Roadmap view            |
 
 ### Prerequisites
@@ -156,11 +157,14 @@ What each tool is for and where every version is pinned:
 ```bash
 make dev-cluster   # Boot a local kind cluster with eBPF support
 make build         # Build all components
-make deploy-dev    # Deploy to the dev cluster
-make test          # Run all tests
+make deploy-dev    # Stub until T5.4: prints "not yet implemented"
+make test          # Run unit tests
 make test-tooling  # Validate tooling config and make wiring (slow)
 make lint          # Run all linters (Go, Python, TypeScript, Bash)
 ```
+
+[docs/TESTING.md](./docs/TESTING.md) explains what each check covers and where it
+runs.
 
 ### Component structure
 

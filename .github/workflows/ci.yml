@@ -9,6 +9,9 @@ on:
   pull_request:
     branches: [main, dev]
 
+permissions:
+  contents: read
+
 # No tool versions appear in this file. The toolchain (Go, Node, pnpm,
 # golangci-lint, shellcheck, kind, kubectl, helm, buf, pre-commit) comes from
 # mise.toml. uv and Python are managed outside mise: the uv version comes from

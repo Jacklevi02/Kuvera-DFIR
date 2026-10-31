@@ -29,9 +29,9 @@ cd analyzer && uv sync              # Python interpreter + ruff, mypy, pytest, s
 cd console  && pnpm install         # TypeScript, ESLint, Prettier, Vitest
 ```
 
-That assumes mise, uv, and a container runtime are already installed.
+That assumes mise, uv, and Docker are already installed.
 [DEVELOPMENT-SETUP.md](./DEVELOPMENT-SETUP.md) is the full walkthrough from a
-clean machine, including Docker/Podman install and the eBPF host requirements.
+clean machine, including Docker install and the eBPF host requirements.
 
 ## Rules
 
@@ -182,7 +182,7 @@ Commit the manifest **and** the lockfile together — CI installs with
 Other dependencies cannot be a versioned binary in a project config. These are
 documented in [DEVELOPMENT-SETUP.md](./DEVELOPMENT-SETUP.md) instead.
 
-- **The container runtime (Docker / Podman).** `mise registry docker` returns
+- **The container runtime (Docker).** `mise registry docker` returns
   `tool not found in registry`. A container runtime is a privileged system daemon
   wired into the kernel, started by systemd, and shared by everything on the
   machine — a per-project version pin would be meaningless. Note the nuance:
@@ -204,9 +204,10 @@ would add a ~120MB download to every developer's setup and every CI run for a
 binary nothing calls. kind is the supported dev cluster; revisit only if a second
 provider earns its place.
 
-Choosing between Docker and Podman as kind's *runtime* is a separate question,
-and both are supported — see
-[DEVELOPMENT-SETUP.md](./DEVELOPMENT-SETUP.md#3-install-a-container-runtime).
+kind's *runtime* is a separate question. Docker is the only supported one: eBPF
+programs cannot load in kind nodes under rootless Podman, and rootful Podman
+needs `sudo` on every cluster command. See
+[DEVELOPMENT-SETUP.md](./DEVELOPMENT-SETUP.md#3-install-docker).
 
 ## Upgrading
 

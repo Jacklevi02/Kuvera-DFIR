@@ -25,13 +25,10 @@ just re-checks node readiness. Pass `KIND_RECREATE=1` to delete and rebuild
 ```bash
 make dev-cluster KIND_CLUSTER_NAME=kuvera-test   # alternate cluster name
 make dev-cluster KIND_NODE_IMAGE=kindest/node:v1.36.1   # pin the node image
-make dev-cluster KIND_EXPERIMENTAL_PROVIDER=podman   # docker | podman | nerdctl
 make dev-cluster KIND_RECREATE=1                 # force a clean rebuild
 ```
 
-Docker and Podman are both supported. Left unset, kind auto-detects whichever
-runtime it finds; set `KIND_EXPERIMENTAL_PROVIDER` explicitly when both are
-installed. See
+Docker is the only supported runtime. See
 [docs/DEVELOPMENT-SETUP.md](../docs/DEVELOPMENT-SETUP.md) for install steps.
 
 After the cluster is up, verify the eBPF prerequisites:

@@ -81,10 +81,10 @@ cd analyzer && uv sync              # Python interpreter + dev dependencies (via
 cd console  && pnpm install         # console dependencies
 ```
 
-Besides uv, the one thing mise does not install is a container runtime — Docker and Podman
-are both supported, and `kind` needs one to host the dev cluster nodes.
+Besides uv, the one thing mise does not install is Docker, which `kind` needs to
+host the dev cluster nodes.
 [docs/DEVELOPMENT-SETUP.md](./docs/DEVELOPMENT-SETUP.md) walks through setup from
-a clean machine, including runtime install steps per platform.
+a clean machine, including Docker install steps per platform.
 
 **pnpm only** for the console — no npm, no yarn. **uv only** for the analyzer —
 never `pip install`. Both lockfiles (`console/pnpm-lock.yaml`,

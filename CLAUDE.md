@@ -170,8 +170,7 @@ Tool versions come from `mise.toml` (toolchain, except Python and uv),
 packages — uv is installed standalone, not by mise), and `console/package.json`
 (console packages). Never pin a version anywhere else — see `docs/TOOLCHAIN.md`
 for the rules and for how to add a new tool. `docs/DEVELOPMENT-SETUP.md` covers
-clean-machine setup, including uv and the container runtime (Docker and Podman
-are both supported), neither of which mise manages. First-time setup:
+clean-machine setup, including uv and Docker, neither of which mise manages. First-time setup:
 
 ```bash
 mise install                        # Go, Node, pnpm, golangci-lint, kind, kubectl, helm, buf, pre-commit

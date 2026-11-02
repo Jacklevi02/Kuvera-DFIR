@@ -173,9 +173,8 @@ Rejected because the tickets already plan `.bpf.o` files, `go:embed` in T4.2, an
 Makefile, and because it would add committed generated objects. This can be
 revisited at T4.2 without changing any pin here.
 
-**`conda:clang`.** Rejected because it also installs GNU `ld`, `as`, `strip` and
-`objcopy`, which would shadow system binutils for everyone in the repo, and it
-takes 1.2 GB. `conda:clang-23` is the compiler alone.
+**`conda:clang`.** Rejected because it takes 1.2 GB and also installs GNU binutils
+that the BPF build does not need. `conda:clang-23` is the compiler alone.
 
 **A pinned Docker builder image.** Rejected because it would be the only tool
 outside `mise.toml`, and `make` would need the Docker socket.
@@ -187,8 +186,6 @@ gain over a checksum-verified fetch.
 
 - `mise install` adds about 580 MB to every machine and CI job. mise-action caches
   it, but the first run of each cache key pays for the download.
-- Activating mise puts `conda:clang-23`'s `bin/` on `PATH`. That is `clang-23` plus
-  incidental utilities such as `zstd` and `xmllint`.
 - Building programs needs network access on the first run, to fetch libbpf.
 - There is no `llvm-strip`, so objects keep their DWARF, at about 935 KB each.
   That is fine against T5.1's 50 MB limit. `conda:llvm-tools` would add it.

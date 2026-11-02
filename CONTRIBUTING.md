@@ -16,8 +16,10 @@ process, release cadence, and coding standards.
 
 Every commit to this repository must carry a **Signed-off-by** trailer. This
 is a lightweight way of confirming that you wrote the code and have the right
-to contribute it under the project's licence, as described in the
-[Developer Certificate of Origin](https://developercertificate.org/).
+to contribute it under the licence of the files you change, as described in the
+[Developer Certificate of Origin](https://developercertificate.org/). That is
+Apache 2.0, except for the eBPF C code covered by
+[sensor/bpf/LICENSE](./sensor/bpf/LICENSE).
 
 ### Adding sign-off automatically
 
@@ -67,7 +69,7 @@ fail the DCO check and cannot be merged until the commits are amended.
 
 Tool versions are managed with [mise](https://mise.jdx.dev). `mise.toml` is the
 single source of truth for Go, Node.js, pnpm, golangci-lint, ShellCheck, kind,
-kubectl, Helm, buf, and pre-commit — do not pin those anywhere else.
+kubectl, Helm, buf, clang, bpftool, and pre-commit — do not pin those anywhere else.
 
 Python and uv are the exception and are **not** managed by mise. Install
 [uv](https://docs.astral.sh/uv/getting-started/installation/) standalone; uv then
@@ -76,7 +78,7 @@ installs and manages the Python interpreter. The uv version is pinned by
 `analyzer/.python-version`.
 
 ```bash
-mise install                        # Go, Node, pnpm, golangci-lint, shellcheck, kind, kubectl, helm, buf, pre-commit
+mise install                        # Go, Node, pnpm, golangci-lint, shellcheck, kind, kubectl, helm, buf, clang, bpftool, pre-commit
 cd analyzer && uv sync              # Python interpreter + dev dependencies (via uv)
 cd console  && pnpm install         # console dependencies
 ```

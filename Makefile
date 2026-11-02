@@ -113,5 +113,5 @@ e2e: ## Run end-to-end tests against the dev cluster
 	@echo "make e2e: not yet implemented (tracked in T20.1)"
 
 clean: ## Remove local build artifacts
-	@rm -rf bin dist build console/dist console/build e2e-output
+	@rm -rf bin dist build console/dist console/build sensor/bpf/build e2e-output
 	@echo "make clean: removed local build artifacts"

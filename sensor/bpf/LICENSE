@@ -1,0 +1,21 @@
+Licensing of the eBPF programs in this directory
+
+The C source and header files in this directory, except vmlinux.h, are dual
+licensed. You may use them under either of these licences, at your choice:
+
+  - GNU General Public License, version 2 only: LICENSE.GPL-2.0
+  - BSD 2-Clause License: LICENSE.BSD-2-Clause
+
+SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+
+Copyright (c) 2026 The Kuvera Authors
+
+Why these files differ from the rest of the repository: the Linux kernel only
+lets a BPF program call GPL-only kernel functions if the program declares a
+GPL-compatible licence, and Apache 2.0 is not one.
+
+Everything else in this repository, including the Makefile in this directory,
+is licensed under the Apache License 2.0. See ../../LICENSE.
+
+vmlinux.h is generated from Linux kernel type information. It is not covered by
+the licences above, and the Kuvera Authors claim no copyright in it.

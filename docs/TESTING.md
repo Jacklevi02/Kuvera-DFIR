@@ -22,7 +22,7 @@ Three gaps a green run does not show:
 - **The analyzer and console have no tests.** `make test` still passes, because it
   accepts pytest's exit 5 (no tests collected) and vitest runs with
   `--passWithNoTests`. Each Go module has one test.
-- **No eBPF program is tested,** because `sensor/bpf/` is empty. The live cluster
+- **No eBPF program is tested,** because `sensor/bpf/` has no programs yet. The live cluster
   check loads a trivial probe, not sensor code.
 
 ## Where each check runs

@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 # No tool versions appear in this file. The toolchain (Go, Node, pnpm,
-# golangci-lint, shellcheck, kind, kubectl, helm, buf, pre-commit) comes from
+# golangci-lint, shellcheck, kind, kubectl, helm, buf, clang, bpftool, pre-commit) comes from
 # mise.toml. uv and Python are managed outside mise: the uv version comes from
 # `[tool.uv] required-version` in analyzer/pyproject.toml, and uv installs the
 # interpreter named in analyzer/.python-version. Python packages come from

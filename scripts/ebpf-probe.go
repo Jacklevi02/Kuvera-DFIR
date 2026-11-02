@@ -5,8 +5,8 @@
 // The program is a tracepoint, like the sensor's, because the kernel requires
 // privilege to load one. It is loaded and never attached.
 //
-// This is a raw syscall so the check needs no module: sensor/go.mod has no
-// dependencies yet. The sensor itself loads through cilium/ebpf.
+// This is a raw syscall so the check builds as a single file, outside any
+// module. The sensor itself loads through cilium/ebpf.
 //
 //	CGO_ENABLED=0 go build -o ebpf-probe scripts/ebpf-probe.go
 package main

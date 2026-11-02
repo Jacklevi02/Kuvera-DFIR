@@ -13,9 +13,12 @@
 # analyzer/pyproject.toml and console/package.json. See docs/TOOLCHAIN.md.
 
 [tools]
-go   = "1.27"
+go = "1.27"
 node = "24"
 pnpm = "11"
+
+# Go vulnerability checker
+"go:golang.org/x/vuln/cmd/govulncheck" = "1.9.0"
 
 # Go linting. No Go manifest pins this, so mise does.
 golangci-lint = "2.14"
@@ -24,12 +27,21 @@ golangci-lint = "2.14"
 shellcheck = "0.11"
 
 # Kubernetes dev cluster (make dev-cluster).
-kind    = "0.32"
+kind = "0.32"
 kubectl = "1.36"
-helm    = "4.2"
+helm = "4.2"
 
 # protobuf/gRPC codegen for api/proto and the generated console client.
 buf = "1.72"
+
+# eBPF toolchain for sensor/bpf/. See docs/adr/0001-ebpf-toolchain.md.
+#
+# clang-<major> is conda-forge's compiler-only package. The package name carries
+# the major version, so a major bump renames this key. sensor/bpf/Makefile reads
+# this line.
+"conda:clang-23" = "23.1"
+# bin= sets the exec bit, which the upstream release archive does not.
+"github:libbpf/bpftool" = { version = "7.8", bin = "bpftool" }
 
 # Optional git hooks (.pre-commit-config.yaml). mise installs it through uv into
 # its own environment, on a uv-managed Python rather than the system one, so uv

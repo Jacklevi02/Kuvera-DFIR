@@ -134,12 +134,12 @@ open http://localhost:8080
 
 Tool versions are managed with [mise](https://mise.jdx.dev) — `mise.toml` is the
 single source of truth for Go, Node.js, pnpm, golangci-lint, ShellCheck, kind,
-kubectl, Helm, buf, and pre-commit. Python is the exception: install [uv](https://docs.astral.sh/uv/)
+kubectl, Helm, buf, clang, bpftool, and pre-commit. Python is the exception: install [uv](https://docs.astral.sh/uv/)
 standalone, and uv installs and pins the interpreter itself
 (`analyzer/.python-version`).
 
 ```bash
-mise install                        # Go, Node, pnpm, golangci-lint, shellcheck, kind, kubectl, helm, buf, pre-commit
+mise install                        # Go, Node, pnpm, golangci-lint, shellcheck, kind, kubectl, helm, buf, clang, bpftool, pre-commit
 cd analyzer && uv sync              # Python interpreter + dev dependencies (via uv)
 cd console  && pnpm install         # console dependencies
 ```
@@ -181,6 +181,8 @@ docs/       Architecture docs, ADRs
 ## Licensing
 
 Apache 2.0 for the core (sensor, operator, basic analyzer, basic console).
+
+The one exception is the sensor's eBPF C code in `sensor/bpf/`, which is dual licensed under GPL-2.0-only or BSD-2-Clause, because the Linux kernel requires a GPL-compatible licence for those programs. See [sensor/bpf/LICENSE](./sensor/bpf/LICENSE).
 
 Future commercial enterprise features (multi-cluster, SSO, compliance reporting, managed cloud) will live in a separate repository under a source-available license.
 

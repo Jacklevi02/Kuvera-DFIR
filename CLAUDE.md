@@ -103,6 +103,7 @@ A self-managed, on-cluster forensics platform with these components:
 - Verifier-friendly: small loops, bounded helpers, no recursion.
 - Userspace loading via `cilium/ebpf`. No `libbpf-go` wrappers.
 - Every BPF program has a corresponding userspace test that loads it into a kernel and checks events.
+- C files in `sensor/bpf/` are dual licensed, not Apache 2.0. Start each with `// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)`, and programs declare `char LICENSE[] SEC("license") = "Dual BSD/GPL";`. See `sensor/bpf/LICENSE`.
 
 ## Architecture rules
 
@@ -173,7 +174,7 @@ for the rules and for how to add a new tool. `docs/DEVELOPMENT-SETUP.md` covers
 clean-machine setup, including uv and Docker, neither of which mise manages. First-time setup:
 
 ```bash
-mise install                        # Go, Node, pnpm, golangci-lint, shellcheck, kind, kubectl, helm, buf, pre-commit
+mise install                        # Go, Node, pnpm, golangci-lint, shellcheck, kind, kubectl, helm, buf, clang, bpftool, pre-commit
 cd analyzer && uv sync              # uv installs Python and the dev dependency group
 cd console  && pnpm install
 ```

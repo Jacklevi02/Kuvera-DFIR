@@ -32,7 +32,6 @@ vendor/
 *.bpf.o
 *.bpf.ll
 sensor/bpf/build/
-sensor/bpf/vmlinux.h
 
 # === Python (analyzer) ===
 __pycache__/

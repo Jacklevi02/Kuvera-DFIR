@@ -182,6 +182,8 @@ docs/       Architecture docs, ADRs
 
 Apache 2.0 for the core (sensor, operator, basic analyzer, basic console).
 
+The one exception is the sensor's eBPF C code in `sensor/bpf/`, which is dual licensed under GPL-2.0-only or BSD-2-Clause, because the Linux kernel requires a GPL-compatible licence for those programs. See [sensor/bpf/LICENSE](./sensor/bpf/LICENSE).
+
 Future commercial enterprise features (multi-cluster, SSO, compliance reporting, managed cloud) will live in a separate repository under a source-available license.
 
 ## Why "Kuvera"?

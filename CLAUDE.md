@@ -103,6 +103,7 @@ A self-managed, on-cluster forensics platform with these components:
 - Verifier-friendly: small loops, bounded helpers, no recursion.
 - Userspace loading via `cilium/ebpf`. No `libbpf-go` wrappers.
 - Every BPF program has a corresponding userspace test that loads it into a kernel and checks events.
+- C files in `sensor/bpf/` are dual licensed, not Apache 2.0. Start each with `// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)`, and programs declare `char LICENSE[] SEC("license") = "Dual BSD/GPL";`. See `sensor/bpf/LICENSE`.
 
 ## Architecture rules
 

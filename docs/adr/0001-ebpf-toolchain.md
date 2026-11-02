@@ -202,16 +202,31 @@ gain over a checksum-verified fetch.
   `BPF_MAP_TYPE_RINGBUF`.
 - **T2.3:** delete `sensor/tools.go` once real code imports `cilium/ebpf`.
 - **T2.5:** run in CI's `Live cluster` job, which adds the second kernel.
-- **T5.1:** the Dockerfile's build stage needs the same clang and bpftool pins.
+- **T2.2:** start each `.bpf.c` file with the SPDX header, and declare the licence
+  string, as set out in [BPF licensing](#bpf-licensing).
+- **T5.1:** the Dockerfile's build stage needs the same clang and bpftool pins. The
+  image embeds compiled BPF objects, so it must also ship `sensor/bpf/LICENSE`,
+  `sensor/bpf/LICENSE.BSD-2-Clause` and libbpf's licence notice.
+
+## BPF licensing
+
+**Decision:** C files in `sensor/bpf/`, except `vmlinux.h`, are dual licensed as
+`(GPL-2.0-only OR BSD-2-Clause)`. Programs declare `Dual BSD/GPL`. Everything else
+stays Apache-2.0.
+
+`bpf_probe_read_kernel`, and so `BPF_CORE_READ`, is GPL-only. The verifier refuses a
+program declaring `Apache-2.0`, so this code cannot follow the repo's licence. `GPL`
+and `Dual BSD/GPL` both load. The dual licence keeps a permissive option, which
+suits an open-core project, and leaves the Apache-2.0 code and the separate
+commercial repository unchanged.
 
 ## Open items
 
-**The `license` string needs a decision before T2.2.** `bpf_probe_read_kernel`, and
-so `BPF_CORE_READ`, is GPL-only. The verifier refuses a program declaring
-`Apache-2.0`, so `sensor/bpf/*.bpf.c` cannot simply follow the repo's licence.
-`GPL` and `Dual BSD/GPL` both load. The recommendation is `Dual BSD/GPL` with a
-matching SPDX header.
+**Legal review is needed before the sensor's first public release.** This ADR makes
+no claim about either point:
 
-The committed `vmlinux.h` is generated from kernel type information. Neither this
-nor the BPF licensing has had legal review, and this ADR makes no claim about
-either. Both should go through a licence check before the sensor is released.
+- The committed `vmlinux.h` is generated from kernel type information, and how it
+  is licensed is unresolved. If review objects, hand-written minimal types are the
+  tested fallback.
+- The dual licence, and shipping compiled BPF objects inside the Apache-2.0 binary,
+  have not had legal review.

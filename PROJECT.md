@@ -132,7 +132,7 @@ The MVP proves the core thesis: forensic evidence can be captured from a comprom
 
 **Phase 1 (months 0–6): open source core**
 
-- Apache 2.0 license the sensor, operator, and basic analyzer.
+- Apache 2.0 license the sensor, operator, and basic analyzer, with the sensor's eBPF C code dual licensed as described under Licensing.
 - Content marketing: blog about Kubernetes forensics, present at KubeCon, contribute to Falco and Tracee communities.
 - Targets: 1,000 GitHub stars, an active community channel, 5 production users.
 
@@ -174,6 +174,8 @@ The gap is real: no project owns "open-core, Kubernetes-native, chain-of-custody
 ## Licensing
 
 Apache License 2.0 for the open core: sensor, operator, basic analyzer, basic console.
+
+The one exception is the sensor's eBPF C code in `sensor/bpf/`, which is dual licensed under GPL-2.0-only or BSD-2-Clause. The Linux kernel only lets a BPF program call GPL-only kernel functions if it declares a GPL-compatible licence, and Apache 2.0 is not one. See `sensor/bpf/LICENSE`.
 
 Future commercial enterprise features — multi-cluster federation, SSO/SAML, compliance reporting, managed cloud — will live in a separate repository under a source-available license (BSL or Elastic License v2). The architectural boundary between open and commercial code is enforced at the repository level, not via feature flags.
 

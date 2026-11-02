@@ -41,6 +41,9 @@ eBPF programs live in `bpf/` and are written in restricted C using CO-RE
 the kernel by the userspace agent via `cilium/ebpf`. Programs must be
 verifier-friendly: bounded loops, no recursion, small stack frames.
 
+The C code in `bpf/` is dual licensed under GPL-2.0-only or BSD-2-Clause, unlike
+the rest of the sensor. See [bpf/LICENSE](./bpf/LICENSE).
+
 ## References
 
 - [cilium/ebpf](https://github.com/cilium/ebpf) — userspace eBPF library

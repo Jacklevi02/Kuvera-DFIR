@@ -16,8 +16,10 @@ process, release cadence, and coding standards.
 
 Every commit to this repository must carry a **Signed-off-by** trailer. This
 is a lightweight way of confirming that you wrote the code and have the right
-to contribute it under the project's licence, as described in the
-[Developer Certificate of Origin](https://developercertificate.org/).
+to contribute it under the licence of the files you change, as described in the
+[Developer Certificate of Origin](https://developercertificate.org/). That is
+Apache 2.0, except for the eBPF C code covered by
+[sensor/bpf/LICENSE](./sensor/bpf/LICENSE).
 
 ### Adding sign-off automatically
 

@@ -18,6 +18,7 @@ versioned binaries at all.
 | golangci-lint, ShellCheck        | ruff, mypy, pytest, structlog      | `git`, `make`, `bash`                      |
 | kind, kubectl, Helm              |                                    | A Linux kernel with BTF (for CO-RE eBPF)   |
 | buf, pre-commit                  |                                    | `sudo` access, to install the runtime once |
+| clang, bpftool                   |                                    | `curl`, `tar`, `sha256sum` (for libbpf headers) |
 
 You never install Go, Node, or kubectl by hand, and you never pin their versions
 anywhere but `mise.toml`. Python and uv are deliberately **not** in `mise.toml`
@@ -139,7 +140,8 @@ mise install
 ```
 
 That reads `mise.toml` and installs Go, Node.js, pnpm, golangci-lint, ShellCheck,
-kind, kubectl, Helm, buf, and pre-commit at the pinned versions. Confirm:
+kind, kubectl, Helm, buf, clang, bpftool, and pre-commit at the pinned versions.
+Confirm:
 
 ```bash
 mise ls

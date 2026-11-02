@@ -10,7 +10,8 @@ need to know what version of something the project uses, read the file in the
 
 | Layer                | Tools                                                                                                                   | Pinned in                            |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| Toolchain / runtimes | Go, Node.js, pnpm, golangci-lint, ShellCheck, kind, kubectl, Helm, buf, pre-commit                                      | `mise.toml`                          |
+| Toolchain / runtimes | Go, Node.js, pnpm, golangci-lint, ShellCheck, kind, kubectl, Helm, buf, clang, bpftool, pre-commit                      | `mise.toml`                          |
+| libbpf headers       | `bpf_helpers.h` and friends for the BPF C programs, fetched and checksum-verified at build time                         | `sensor/bpf/Makefile`                |
 | uv                   | uv itself (installed standalone, **not** by mise)                                                                       | `[tool.uv] required-version` in `analyzer/pyproject.toml` |
 | Python interpreter   | CPython, installed and managed by uv                                                                                    | `analyzer/.python-version`           |
 | Go modules           | `cilium/ebpf`, controller-runtime, grpc-gateway                                                                           | `sensor/`, `operator/`, `api/go.mod` |
@@ -18,13 +19,14 @@ need to know what version of something the project uses, read the file in the
 | Console packages     | TypeScript, React, Vite, Vitest, ESLint, Prettier, TanStack Query, TanStack Router, Tailwind, shadcn/ui, react-hook-form, zod | `console/package.json`               |
 
 Lockfiles (`analyzer/uv.lock`, `console/pnpm-lock.yaml`) are committed and CI
-installs from them with `pnpm install --frozen-lockfile` / `uv sync --locked`. Go modules have no
-`go.sum` yet because no component has dependencies.
+installs from them with `pnpm install --frozen-lockfile` / `uv sync --locked`. A
+Go module's `go.sum` is committed once it has dependencies; only `sensor/` does
+so far.
 
 ## Getting set up
 
 ```bash
-mise install                        # Go, Node, pnpm, golangci-lint, shellcheck, kind, kubectl, helm, buf, pre-commit
+mise install                        # Go, Node, pnpm, golangci-lint, shellcheck, kind, kubectl, helm, buf, clang, bpftool, pre-commit
 cd analyzer && uv sync              # Python interpreter + ruff, mypy, pytest, structlog
 cd console  && pnpm install         # TypeScript, ESLint, Prettier, Vitest
 ```
@@ -86,6 +88,8 @@ clean machine, including Docker install and the eBPF host requirements.
 | **ESLint**        | console            | Lint (flat config)                                              |
 | **Prettier**      | console            | Format                                                          |
 | **buf**           | api, console       | Protobuf/gRPC codegen; the generated console API client         |
+| **clang**         | sensor             | Compiles the eBPF C programs; see [ADR 0001](./adr/0001-ebpf-toolchain.md) |
+| **bpftool**       | sensor             | Regenerates `sensor/bpf/vmlinux.h`; inspects programs on a node |
 | **pre-commit**    | all                | Optional local git hooks; see [TESTING.md](./TESTING.md#pre-commit-hooks) |
 | **kind**          | deploy             | Local dev cluster with BTF and bpffs for eBPF                   |
 | **kubectl**       | deploy             | Cluster interaction                                             |
@@ -222,6 +226,16 @@ make lint && make test
 Bumping Go also means editing the `go` directive in all three `go.mod` files
 and `run.go` in `.golangci.yaml`. Everything else is picked up automatically.
 
+Bumping clang's major version renames the tool, because conda-forge's
+compiler-only package carries it (`conda:clang-23`), so `mise use` adds a second
+entry: remove the old one. `sensor/bpf/Makefile` reads the new pin from
+`mise.toml` and needs no edit.
+
+libbpf is bumped in `sensor/bpf/Makefile`: change `LIBBPF_VERSION` and
+`LIBBPF_SHA256` together. Regenerate `sensor/bpf/vmlinux.h` with
+`make -C sensor/bpf vmlinux` only when a program needs types the snapshot lacks,
+and commit the result.
+
 uv and Python are upgraded outside mise:
 
 ```bash
@@ -241,3 +255,6 @@ refresh the library pins; commit the resulting lockfile.
   it. Revisit when TS 7.1 lands that API.
 - **Node stays on the Active LTS line.** Move to the next even release once it
   reaches Active LTS, not when it is first published as Current.
+- **Do not downgrade `cilium/ebpf` or libbpf below their ADR floors.** Older
+  releases fail on current kernels. See
+  [ADR 0001](./adr/0001-ebpf-toolchain.md#evidence).

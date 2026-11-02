@@ -173,7 +173,7 @@ for the rules and for how to add a new tool. `docs/DEVELOPMENT-SETUP.md` covers
 clean-machine setup, including uv and Docker, neither of which mise manages. First-time setup:
 
 ```bash
-mise install                        # Go, Node, pnpm, golangci-lint, shellcheck, kind, kubectl, helm, buf, pre-commit
+mise install                        # Go, Node, pnpm, golangci-lint, shellcheck, kind, kubectl, helm, buf, clang, bpftool, pre-commit
 cd analyzer && uv sync              # uv installs Python and the dev dependency group
 cd console  && pnpm install
 ```

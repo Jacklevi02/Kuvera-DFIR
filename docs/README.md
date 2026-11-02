@@ -12,10 +12,10 @@ for the Kuvera DFIR platform.
   dev cluster, troubleshooting
 - `TESTING.md` — what each check covers, where it runs, what blocks a merge,
   and what is by hand only
+- `adr/` — Architecture Decision Records
 
 ## Planned additions
 
 - `architecture/` — component interaction diagrams and data flow
-- `adr/` — Architecture Decision Records
 - `guides/` — operator and investigator guides
 - `api-reference/` — generated from proto definitions via buf

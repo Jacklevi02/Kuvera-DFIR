@@ -36,10 +36,9 @@ buf = "1.72"
 
 # eBPF toolchain for sensor/bpf/. See docs/adr/0001-ebpf-toolchain.md.
 #
-# clang-<major> is conda-forge's compiler-only package. The plain conda:clang
-# package also ships GNU ld, as, strip and objcopy, which would shadow the system
-# binutils for everyone working in this repo. The package name carries the major
-# version, so a major bump renames this key. sensor/bpf/Makefile reads this line.
+# clang-<major> is conda-forge's compiler-only package. The package name carries
+# the major version, so a major bump renames this key. sensor/bpf/Makefile reads
+# this line.
 "conda:clang-23" = "23.1"
 # bin= sets the exec bit, which the upstream release archive does not.
 "github:libbpf/bpftool" = { version = "7.8", bin = "bpftool" }

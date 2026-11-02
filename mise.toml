@@ -13,9 +13,12 @@
 # analyzer/pyproject.toml and console/package.json. See docs/TOOLCHAIN.md.
 
 [tools]
-go   = "1.27"
+go = "1.27"
 node = "24"
 pnpm = "11"
+
+# Go vulnerability checker
+"go:golang.org/x/vuln/cmd/govulncheck" = "1.9.0"
 
 # Go linting. No Go manifest pins this, so mise does.
 golangci-lint = "2.14"
@@ -24,9 +27,9 @@ golangci-lint = "2.14"
 shellcheck = "0.11"
 
 # Kubernetes dev cluster (make dev-cluster).
-kind    = "0.32"
+kind = "0.32"
 kubectl = "1.36"
-helm    = "4.2"
+helm = "4.2"
 
 # protobuf/gRPC codegen for api/proto and the generated console client.
 buf = "1.72"
@@ -45,4 +48,3 @@ buf = "1.72"
 # its own environment, on a uv-managed Python rather than the system one, so uv
 # has to be installed before `mise install` runs.
 "pypi:pre-commit" = { version = "4.7", uvx_args = "--python-preference only-managed" }
-"go:golang.org/x/vuln/cmd/govulncheck" = "latest"

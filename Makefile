@@ -51,6 +51,12 @@ PNPM ?= pnpm
 # Go toolchain. Override if go lives outside $PATH.
 GO ?= go
 
+# eBPF programs (T2.2). Compiling is also their lint and test: -Wall -Werror and
+# the _Static_asserts run at compile time. Tests that run make in a throwaway
+# copy set BPF_BUILD=true (the no-op command, not a boolean), so the copy doesn't
+# refetch libbpf.
+BPF_BUILD ?= $(MAKE) --no-print-directory -C sensor/bpf
+
 .PHONY: help dev-cluster dev-cluster-down build test test-tooling lint deploy-dev e2e clean
 
 help: ## List all available targets
@@ -69,12 +75,14 @@ dev-cluster-down: ## Tear down the local kind dev cluster (T1.3)
 # Go binaries land in bin/, the analyzer wheel and sdist in dist/analyzer/. The
 # console joins here with T17.1, which adds Vite and its build script.
 build: ## Build all components (sensor, operator, api, analyzer)
+	@$(BPF_BUILD)
 	@cd sensor   && $(GO) build -o ../bin/ ./...
 	@cd operator && $(GO) build -o ../bin/ ./...
 	@cd api      && $(GO) build -o ../bin/ ./...
 	@cd analyzer && $(UV) build --quiet --out-dir ../dist/analyzer
 
 test: ## Run unit tests across all components (T1.6)
+	@$(BPF_BUILD)
 	@cd sensor   && $(GO) test ./...
 	@cd operator && $(GO) test ./...
 	@cd api      && $(GO) test ./...
@@ -92,7 +100,8 @@ test-tooling: ## Validate tooling config and make wiring (T1.15)
 	@bash scripts/makefile_smoke_test.sh
 	@bash scripts/pre_commit_test.sh
 
-lint: ## Run all linters: Go (T1.4), Python and TypeScript (T1.5), Bash (T1.15)
+lint: ## Run all linters: Go (T1.4), Python and TypeScript (T1.5), Bash (T1.15), eBPF C (T2.2)
+	@$(BPF_BUILD)
 	@cd sensor   && $(GOLANGCI_LINT) run ./...
 	@cd operator && $(GOLANGCI_LINT) run ./...
 	@cd api      && $(GOLANGCI_LINT) run ./...

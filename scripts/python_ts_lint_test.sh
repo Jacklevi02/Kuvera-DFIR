@@ -214,7 +214,7 @@ export MISE_TRUSTED_CONFIG_PATHS="$work"
 console_lint() {
     local status=0
     printf '%b' "$2" >"$work/console/src/$1"
-    make -C "$work" lint GOLANGCI_LINT=true UV=true SHELLCHECK=true 2>&1 || status=$?
+    make -C "$work" lint GOLANGCI_LINT=true UV=true SHELLCHECK=true BPF_BUILD=true 2>&1 || status=$?
     rm -f "$work/console/src/$1"
     return "$status"
 }
@@ -267,7 +267,7 @@ expect_lint_error "unused variable" probe.ts 'const unused: number = 1;\n' \
 # section 9 this needs the real uv, and the copy builds its own analyzer venv.
 echo "==> make lint reports misformatted Python"
 printf '"""Probe."""\n\nVALUE: dict[str,int] = {"a":1}\n' >"$work/analyzer/kuvera_analyzer/probe.py"
-if output="$(make -C "$work" lint GOLANGCI_LINT=true PNPM=true SHELLCHECK=true 2>&1)"; then
+if output="$(make -C "$work" lint GOLANGCI_LINT=true PNPM=true SHELLCHECK=true BPF_BUILD=true 2>&1)"; then
     echo "  FAIL: make lint passed"
     fail=1
 elif grep -q "would be reformatted" <<<"$output"; then

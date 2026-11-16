@@ -17,6 +17,11 @@ make -C sensor/bpf           # compile each *.bpf.c to build/*.bpf.o
 make -C sensor/bpf clean     # remove build/
 ```
 
+`-C sensor/bpf` makes `make` change into `sensor/bpf/` before reading its
+`Makefile`, so you can run it from the repo root. Running `make` inside
+`sensor/bpf/` does the same thing. Paths in this Makefile, such as `build/`, are
+relative to `sensor/bpf/`. The root `make clean` also removes `sensor/bpf/build/`.
+
 The first build downloads the libbpf headers (`bpf_helpers.h`,
 `bpf_core_read.h` and others) into `build/libbpf-<version>/` and checks their
 SHA-256. clang is `clang-<major>` from `mise.toml`, and the build refuses any

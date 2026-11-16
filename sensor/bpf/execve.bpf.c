@@ -19,4 +19,12 @@ struct event {
 
 _Static_assert(sizeof(struct event) == 296, "struct event layout changed");
 
+// Ring buffer shared by all CPUs; userspace (T2.3) drains it.
+// Size is in bytes: a power of two and a page multiple. 256 KiB holds ~860
+// events (296 B + 8 B header each); when full, reserve fails and the event drops.
+struct {
+	__uint(type, BPF_MAP_TYPE_RINGBUF);
+	__uint(max_entries, 256 * 1024);
+} events SEC(".maps");
+
 char LICENSE[] SEC("license") = "Dual BSD/GPL";

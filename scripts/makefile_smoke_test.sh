@@ -104,7 +104,7 @@ cat >"$work/scripts/lint_probe.sh" <<'PROBE'
 #!/usr/bin/env bash
 echo $1
 PROBE
-if output="$(make -C "$work" lint GOLANGCI_LINT=true UV=true PNPM=true 2>&1)"; then
+if output="$(make -C "$work" lint GOLANGCI_LINT=true UV=true PNPM=true BPF_BUILD=true 2>&1)"; then
 	echo "  FAIL: make lint passed"
 	fail=1
 elif grep -q SC2086 <<<"$output"; then

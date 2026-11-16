@@ -184,3 +184,16 @@ jobs:
           docker cp "$RUNNER_TEMP/ebpf-probe" kuvera-dev-control-plane:/ebpf-probe
           docker exec kuvera-dev-control-plane /ebpf-probe
           docker exec --user 65534 kuvera-dev-control-plane /ebpf-probe 2>&1 | grep -F 'operation not permitted'
+
+      # The verifier accepts the sensor's programs and their CO-RE relocations
+      # resolve on this runner's kernel. Loaded and pinned, never attached. On a
+      # failure, bpftool prints the verifier log.
+      - name: Load the sensor's eBPF program in a kind node
+        run: |
+          make -C sensor/bpf
+          node=kuvera-dev-control-plane
+          docker cp "$(mise which bpftool)" "$node:/usr/local/bin/bpftool"
+          docker cp sensor/bpf/build/execve.bpf.o "$node:/root/execve.bpf.o"
+          docker exec "$node" bpftool prog load /root/execve.bpf.o /sys/fs/bpf/kuvera-execve
+          docker exec "$node" bpftool prog show pinned /sys/fs/bpf/kuvera-execve
+          docker exec "$node" rm /sys/fs/bpf/kuvera-execve

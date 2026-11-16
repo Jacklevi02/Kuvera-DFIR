@@ -9,9 +9,9 @@ What checks Kuvera has, where each one runs, and what blocks a merge. Run
 | Kind            | Run with                                 | Covers                                                                                                                                                                                           |
 | --------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Unit tests      | `make test`                              | Go, Python and TypeScript tests, plus an offline check of the kind config and cluster scripts using a stub `kubectl`.                                                                            |
-| Lint            | `make lint`                              | golangci-lint (including gofmt and goimports), ruff (lint and format), mypy, ESLint, Prettier, and ShellCheck on `scripts/*.sh`.                                                                 |
+| Lint            | `make lint`                              | golangci-lint (including gofmt and goimports), ruff (lint and format), mypy, ESLint, Prettier, ShellCheck on `scripts/*.sh`, and the eBPF C compiled with `-Wall -Werror`.                       |
 | Tooling scripts | `make test-tooling`                      | Config validity, version-pin rules, `make` wiring, and that lint and hooks really fail on bad input, using probes in a throwaway copy of the repo. Slow: it re-runs `make lint` and `make test`. |
-| Live cluster    | [By hand](#what-only-runs-by-hand) or CI | A real kind cluster boots, nodes are Ready, BTF is present, and a node loads an eBPF program as root and refuses it as an unprivileged user.                                                     |
+| Live cluster    | [By hand](#what-only-runs-by-hand) or CI | A real kind cluster boots, nodes are Ready, BTF is present, a node loads a probe program as root and refuses it as an unprivileged user, and the verifier accepts the sensor's eBPF programs.    |
 | End-to-end      | Nothing yet                              | No end-to-end tests exist.                                                                                                                                                                       |
 
 Three gaps a green run does not show:
@@ -22,8 +22,9 @@ Three gaps a green run does not show:
 - **The analyzer and console have no tests.** `make test` still passes, because it
   accepts pytest's exit 5 (no tests collected) and vitest runs with
   `--passWithNoTests`. Each Go module has one test.
-- **No eBPF program is tested,** because `sensor/bpf/` has no programs yet. The live cluster
-  check loads a trivial probe, not sensor code.
+- **eBPF programs are loaded, never run.** The live cluster check proves the verifier
+  accepts them on the runner's kernel, but nothing attaches them or checks the events
+  they produce. That's T2.5.
 
 ## Where each check runs
 
@@ -44,11 +45,18 @@ CI job names are shortened here; the full names are in the
 | ESLint                        | No          | Yes         | Lint         | `eslint`                    | `pnpm run lint` in `console/`                          |
 | Prettier                      | No          | Yes         | Lint         | `prettier`                  | `pnpm run format:check` in `console/`                  |
 | ShellCheck                    | No          | Yes         | Lint         | No                          | `shellcheck scripts/*.sh`                              |
+| eBPF compile                  | Yes         | Yes         | Lint, Test   | No                          | `make -C sensor/bpf`                                   |
 | Tooling scripts               | No          | No          | Validate     | No                          | `make test-tooling`                                    |
 | DCO sign-off                  | No          | No          | DCO          | No                          | CI only                                                |
 | No commits to `main` or `dev` | No          | No          | No           | `no commits to main or dev` | Hook only; the ruleset blocks direct pushes            |
 | Live cluster                  | No          | No          | Live cluster | No                          | [By hand](#what-only-runs-by-hand)                     |
 | TypeScript typecheck          | No          | No          | No           | No                          | [By hand](#what-only-runs-by-hand)                     |
+
+`make build` also compiles the eBPF programs. Compiling is their lint and their only
+offline test: `-Wall -Werror` and the `_Static_assert`s on event layouts run at compile
+time. Tests that run `make` in a throwaway copy skip it with `BPF_BUILD=true`.
+`BPF_BUILD` is the command to run, not a flag, and `true` is the shell command that
+does nothing and succeeds. `GOLANGCI_LINT=true` and the others work the same way.
 
 Bash scripts test themselves, with no framework. `scripts/makefile_smoke_test.sh`
 fails if a `scripts/*_test.sh` file is not wired into `make test` or
@@ -104,8 +112,18 @@ docker cp bin/ebpf-probe kuvera-dev-control-plane:/ebpf-probe
 docker exec kuvera-dev-control-plane /ebpf-probe     # expect: eBPF program loaded
 docker exec --user 65534 kuvera-dev-control-plane /ebpf-probe 2>&1 \
   | grep -F 'operation not permitted'                # must refuse without privilege
+make -C sensor/bpf
+docker cp "$(mise which bpftool)" kuvera-dev-control-plane:/usr/local/bin/bpftool
+docker cp sensor/bpf/build/execve.bpf.o kuvera-dev-control-plane:/root/execve.bpf.o
+docker exec kuvera-dev-control-plane bpftool prog load /root/execve.bpf.o /sys/fs/bpf/kuvera-execve
+docker exec kuvera-dev-control-plane rm /sys/fs/bpf/kuvera-execve   # bpffs is the host's
 make dev-cluster-down
 ```
+
+`make dev-cluster-down` deletes the nodes and everything copied into them. A pin in
+`/sys/fs/bpf` survives it, because the nodes bind-mount the host's bpffs, so remove
+pins first. If one is left over, run `sudo rm /sys/fs/bpf/kuvera-execve` on the host.
+[sensor/bpf/README.md](../sensor/bpf/README.md) covers what each step does.
 
 **Cluster lifecycle.** CI boots one fresh cluster and never tears it down, so
 these are only ever exercised by hand: re-running `make dev-cluster` on an existing
